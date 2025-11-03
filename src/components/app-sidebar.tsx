@@ -1,0 +1,61 @@
+"use client"
+
+import { BookUser, MessageSquareWarning, MapPinned, CircleUserRound } from "lucide-react"
+import { usePathname } from "next/navigation";
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarGroupContent,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarMenuButton,
+} from "@/components/ui/sidebar"
+
+const items = [
+    { title: "Danh sách truy nã", icon: BookUser, url: "/" },
+    { title: "Báo cáo", icon: MessageSquareWarning, url: "/report" },
+    { title: "Bản đồ", icon: MapPinned, url: "/map" },
+]
+
+export function AppSidebar() {
+    const pathname = usePathname();
+    return (
+        <Sidebar>
+            <SidebarContent>
+                <SidebarGroup>
+                    <SidebarGroupLabel>Tra cứu tội phạm</SidebarGroupLabel>
+                    <div className="p-4 border-t rounded-xl mt-3 bg-amber-500 flex items-center gap-3">
+                        <CircleUserRound></CircleUserRound>
+                        <div>
+                            <p className="text-sm font-medium">Nguyễn Văn A</p>
+                            <p className="text-xs text-gray-500">Người dùng</p>
+                        </div>
+                    </div>
+                    <SidebarGroupContent>
+                        <SidebarMenu>
+                            {items.map((item) => {
+                                const isActive = pathname === item.url;
+                                return (
+                                    <SidebarMenuItem key={item.title}>
+                                        <SidebarMenuButton asChild>
+                                            <a href={item.url}
+                                                className={`flex items-center border border-[#ccc]  gap-3 w-full p-2 rounded-md transition ${isActive
+                                                    ? "text-gray-800 bg-amber-500 font-semibold"
+                                                    : "hover:bg-amber-500 text-gray-800"
+                                                    }`}>
+                                                <item.icon size={16} />
+                                                <span>{item.title}</span>
+                                            </a>
+                                        </SidebarMenuButton>
+                                    </SidebarMenuItem>
+                                )
+                            })}
+                        </SidebarMenu>
+                    </SidebarGroupContent>
+                </SidebarGroup>
+            </SidebarContent>
+        </Sidebar>
+    )
+}
