@@ -10,7 +10,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
     const [open, setOpen] = useState(true)
     return (
         <SidebarContext.Provider value={{ open, setOpen }}>
-            <div className="flex h-screen w-full">{children}</div>
+            <div className=" h-screen w-full">{children}</div>
         </SidebarContext.Provider>
     )
 }
@@ -48,7 +48,7 @@ export function SidebarGroupLabel({ children }: { children: React.ReactNode }) {
 }
 
 export function SidebarGroupContent({ children }: { children: React.ReactNode }) {
-    return <div className="mt-2">{children}</div>
+    return <div className="mt-3">{children}</div>
 }
 
 export function SidebarMenu({ children }: { children: React.ReactNode }) {
@@ -56,7 +56,7 @@ export function SidebarMenu({ children }: { children: React.ReactNode }) {
 }
 
 export function SidebarMenuItem({ children }: { children: React.ReactNode }) {
-    return <li>{children}</li>
+    return <li className="">{children}</li>
 }
 
 export function SidebarMenuButton({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) {

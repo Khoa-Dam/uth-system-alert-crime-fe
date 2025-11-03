@@ -26,13 +26,6 @@ export function AppSidebar() {
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupLabel>Tra cứu tội phạm</SidebarGroupLabel>
-                    <div className="p-4 border-t rounded-xl mt-3 bg-amber-500 flex items-center gap-3">
-                        <CircleUserRound></CircleUserRound>
-                        <div>
-                            <p className="text-sm font-medium">Nguyễn Văn A</p>
-                            <p className="text-xs text-gray-500">Người dùng</p>
-                        </div>
-                    </div>
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {items.map((item) => {
