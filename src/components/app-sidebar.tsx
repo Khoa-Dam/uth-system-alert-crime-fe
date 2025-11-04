@@ -1,7 +1,8 @@
 "use client"
 
-import { BookUser, MessageSquareWarning, MapPinned, CircleUserRound } from "lucide-react"
+import { BookUser, MessageSquareWarning, MapPinned, Trophy } from "lucide-react"
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import {
     Sidebar,
     SidebarContent,
@@ -15,7 +16,7 @@ import {
 
 const items = [
     { title: "Danh sách truy nã", icon: BookUser, url: "/" },
-    { title: "Báo cáo", icon: MessageSquareWarning, url: "/report" },
+    { title: "Báo cáo", icon: MessageSquareWarning, url: "/reports" },
     { title: "Bản đồ", icon: MapPinned, url: "/map" },
 ]
 
@@ -33,14 +34,14 @@ export function AppSidebar() {
                                 return (
                                     <SidebarMenuItem key={item.title}>
                                         <SidebarMenuButton asChild>
-                                            <a href={item.url}
+                                            <Link href={item.url}
                                                 className={`flex items-center border border-[#ccc]  gap-3 w-full p-2 rounded-md transition ${isActive
                                                     ? "text-gray-800 bg-amber-500 font-semibold"
                                                     : "hover:bg-amber-500 text-gray-800"
                                                     }`}>
                                                 <item.icon size={16} />
                                                 <span>{item.title}</span>
-                                            </a>
+                                            </Link>
                                         </SidebarMenuButton>
                                     </SidebarMenuItem>
                                 )
