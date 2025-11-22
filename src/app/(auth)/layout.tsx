@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { Logo } from "@/components/icons";
 
 // import { Logo } from "@/components/icons";
 
@@ -17,7 +18,7 @@ export default function AuthLayout({ children }: React.PropsWithChildren) {
             href="/"
             className="flex items-center gap-2 rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
-            {/* <Logo size={48} /> */}
+            <Logo size={48} style={{ color: '#000000' }} />
           </Link>
         </div>
 

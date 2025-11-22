@@ -5,6 +5,7 @@
  */
 export const publicRoutes = [
     "/", // Trang chủ - public, không cần auth
+    "/landing-page", // Trang giới thiệu hệ thống
     "/terms",
     "/privacy",
     "/about",

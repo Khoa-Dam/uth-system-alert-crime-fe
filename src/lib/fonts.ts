@@ -1,4 +1,4 @@
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono, Merriweather } from "next/font/google";
 import localFont from "next/font/local";
 
 /* -----------------------------------------------------------------------------------------------
@@ -15,6 +15,10 @@ export const fontMono = JetBrains_Mono({
     subsets: ["latin"],
 });
 
+export const merriweather = Merriweather({
+    variable: "--font-merriweather",
+    subsets: ["latin"],
+});
 /* -----------------------------------------------------------------------------------------------
  * Local Fonts
  * -----------------------------------------------------------------------------------------------*/

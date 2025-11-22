@@ -5,6 +5,7 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { AppHeader } from "@/components/app-header"
 import { siteConfig } from "@/config/site.config"
 import { Logo } from "@/components/icons"
+import Link from "next/link"
 export const metadata: Metadata = {
     title: {
         default: siteConfig.name,
@@ -43,10 +44,19 @@ export default async function PublicLayout({
             {/* Header đơn giản cho public pages */}
             <header className="bg-white shadow-sm border-b sticky top-0 z-50">
                 <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-                    <Logo />
-                    <h1 className="text-xl font-bold text-amber-600">
-                        Hệ thống tra cứu tội phạm truy nã
-                    </h1>
+                    <div className="flex items-center gap-2">
+                        <Link
+                            aria-label="Go to home page"
+                            href="/"
+                            className="flex items-center gap-2 rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        >
+                            <Logo size={48} style={{ color: '#000000' }} />
+                        </Link>
+                        <h1 className="text-xl font-bold text-amber-600">
+                            Hệ thống tra cứu tội phạm truy nã
+                        </h1>
+                    </div>
+
                     <nav className="flex items-center gap-4">
                         <a href="/login" className="text-gray-600 hover:text-amber-600 transition">
                             Đăng nhập
