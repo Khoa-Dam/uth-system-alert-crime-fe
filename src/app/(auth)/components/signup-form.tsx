@@ -12,6 +12,7 @@ import authService from "@/service/auth.service"
 import { signUp } from "@/utils/validation"
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
+import { Loader2 } from "lucide-react"
 
 export function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
     const router = useRouter()
@@ -65,17 +66,11 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
         try {
             console.log('[Signup] Submitting:', { name: name.trim(), email: email.trim().toLowerCase() })
 
-            const result = await authService.signup({
+            await authService.signup({
                 name: name.trim(),
                 email: email.trim().toLowerCase(),
                 password,
             })
-
-            console.log('[Signup] Success:', result)
-
-            // Nếu không có error (catch block không chạy) thì coi như thành công
-            // Backend có thể trả về empty response nhưng vẫn là success (status 200/201)
-            toast.success('Đăng ký thành công! Đang đăng nhập...')
 
             // Tự động đăng nhập sau khi đăng ký thành công
             const loginResult = await signIn("credentials", {
@@ -91,7 +86,14 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
                 router.refresh()
             } else if (loginResult?.ok) {
                 // Đăng nhập thành công, redirect đến trang ban đầu hoặc trang chủ
-                toast.success('Đăng nhập thành công!')
+                toast.success('Đăng ký thành công!', {
+                    description: 'Đang chuyển hướng...',
+                    duration: 2000,
+                })
+
+                // Small delay to show success message before redirect
+                await new Promise(resolve => setTimeout(resolve, 800))
+
                 const redirectTo = redirectPath || '/'
                 router.push(redirectTo)
                 router.refresh()
@@ -215,7 +217,14 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
                                     )}
                                 </div>
                                 <Button type="submit" className="w-full" disabled={isLoading}>
-                                    {isLoading ? "Đang đăng ký..." : "Đăng ký"}
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Đang đăng ký...
+                                        </>
+                                    ) : (
+                                        "Đăng ký"
+                                    )}
                                 </Button>
                             </div>
                             <div className="text-center text-sm">

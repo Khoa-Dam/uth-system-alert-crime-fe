@@ -12,6 +12,7 @@ import { signIn } from "next-auth/react"
 import { email, password } from "@/utils/validation"
 import { z } from "zod"
 import { toast } from "sonner"
+import { Loader2 } from "lucide-react"
 
 const loginSchema = z.object({
     email,
@@ -143,6 +144,15 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 setError('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
                 toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
             } else if (result?.ok) {
+                // Show success message
+                toast.success('Đăng nhập thành công!', {
+                    description: 'Đang chuyển hướng...',
+                    duration: 2000,
+                })
+
+                // Small delay to show success message before redirect
+                await new Promise(resolve => setTimeout(resolve, 800))
+
                 // Redirect to the original path if exists, otherwise go to home
                 const redirectTo = redirectPath || '/'
                 router.push(redirectTo)
@@ -234,6 +244,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                                     <Input
                                         id="password"
                                         type="password"
+                                        placeholder="password"
                                         required
                                         value={passwordValue}
                                         onChange={(e) => {
@@ -250,7 +261,14 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                                     )}
                                 </div>
                                 <Button type="submit" className="w-full" disabled={isLoading}>
-                                    {isLoading ? "Đang đăng nhập..." : "Login"}
+                                    {isLoading ? (
+                                        <>
+                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            Đang đăng nhập...
+                                        </>
+                                    ) : (
+                                        "Login"
+                                    )}
                                 </Button>
                             </div>
                             <div className="text-center text-sm">
