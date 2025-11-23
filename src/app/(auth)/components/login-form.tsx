@@ -74,25 +74,94 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         setIsLoading(true)
 
         try {
-            const result = await signIn("credentials", {
+            // Check server connection first
+            const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3001/api'
+            const healthCheckUrl = apiUrl.endsWith('/api')
+                ? `${apiUrl.replace('/api', '')}/health`
+                : `${apiUrl}/health`
+
+            try {
+                const healthCheck = await fetch(healthCheckUrl, {
+                    method: 'GET',
+                    signal: AbortSignal.timeout(5000), // 5 second timeout
+                }).catch(() => null)
+
+                // If health check fails, try to connect to auth endpoint
+                if (!healthCheck || !healthCheck.ok) {
+                    const testUrl = apiUrl.endsWith('/api')
+                        ? `${apiUrl}/auth/login`
+                        : `${apiUrl}/api/auth/login`
+
+                    const testResponse = await fetch(testUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: 'test', password: 'test' }),
+                        signal: AbortSignal.timeout(5000),
+                    }).catch((err: any) => {
+                        // Network error detected
+                        if (err?.message?.includes('fetch failed') ||
+                            err?.cause?.code === 'ECONNREFUSED' ||
+                            err?.name === 'AbortError') {
+                            throw new Error('CONNECTION_ERROR')
+                        }
+                        return null
+                    })
+
+                    // If we can't even reach the server, it's a connection issue
+                    if (!testResponse) {
+                        throw new Error('CONNECTION_ERROR')
+                    }
+                }
+            } catch (connectionErr: any) {
+                if (connectionErr?.message === 'CONNECTION_ERROR') {
+                    const errorMsg = 'Không thể kết nối đến server. Vui lòng đảm bảo server backend đã được khởi động.'
+                    setError(errorMsg)
+                    toast.error(errorMsg)
+                    setIsLoading(false)
+                    return
+                }
+                // If it's a timeout or other error, continue with login attempt
+            }
+
+            // Add timeout to detect connection issues
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Timeout: Không thể kết nối đến server. Vui lòng kiểm tra lại kết nối.')), 10000)
+            })
+
+            const signInPromise = signIn("credentials", {
                 email: emailValue.trim(),
                 password: passwordValue,
                 redirect: false,
             })
 
+            const result = await Promise.race([signInPromise, timeoutPromise]) as any
+
             if (result?.error) {
+                // NextAuth doesn't pass custom error messages, so we check for common error types
+                // If authorize throws, NextAuth returns generic error
+                // We'll show connection error if we detect it was a network issue
                 setError('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
+                toast.error('Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.')
             } else if (result?.ok) {
                 // Redirect to the original path if exists, otherwise go to home
                 const redirectTo = redirectPath || '/'
                 router.push(redirectTo)
                 router.refresh()
+            } else {
+                // If result is null or undefined, it might be a connection issue
+                setError('Không thể kết nối đến server. Vui lòng kiểm tra lại kết nối hoặc đảm bảo server đã được khởi động.')
+                toast.error('Không thể kết nối đến server. Vui lòng kiểm tra lại kết nối.')
             }
         } catch (err: any) {
-            setError(
-                err?.message ||
-                'Đăng nhập thất bại. Vui lòng thử lại.'
-            )
+            if (err?.message?.includes('Timeout') || err?.message?.includes('CONNECTION_ERROR')) {
+                const errorMsg = 'Không thể kết nối đến server. Vui lòng đảm bảo server backend đã được khởi động.'
+                setError(errorMsg)
+                toast.error(errorMsg)
+            } else {
+                const errorMessage = err?.message || 'Đăng nhập thất bại. Vui lòng thử lại.'
+                setError(errorMessage)
+                toast.error(errorMessage)
+            }
         } finally {
             setIsLoading(false)
         }
@@ -129,8 +198,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                                 <span className="relative z-10 bg-background px-2 text-muted-foreground">Or continue with</span>
                             </div> */}
                             <div className="grid gap-6">
-
-
+                                {error && (
+                                    <div className="rounded-md bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 p-3 text-sm text-red-600 dark:text-red-400">
+                                        {error}
+                                    </div>
+                                )}
                                 <div className="grid gap-2">
                                     <Label htmlFor="email">Email</Label>
                                     <Input

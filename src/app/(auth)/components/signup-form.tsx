@@ -177,7 +177,7 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
                                     <Input
                                         id="password"
                                         type="password"
-                                        placeholder="Ít nhất 8 ký tự, có chữ hoa, chữ thường, số và ký tự đặc biệt"
+                                        placeholder="mật khẩu"
                                         required
                                         value={password}
                                         onChange={(e) => {

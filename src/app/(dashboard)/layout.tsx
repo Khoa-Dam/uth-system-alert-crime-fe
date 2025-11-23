@@ -50,7 +50,7 @@ export default async function PublicLayout({
                             href="/"
                             className="flex items-center gap-2 rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
-                            <Logo size={48} style={{ color: '#000000' }} />
+                            <Logo size={48} style={{ color: 'red' }} />
                         </Link>
                         <h1 className="text-xl font-bold text-amber-600">
                             Hệ thống tra cứu tội phạm truy nã

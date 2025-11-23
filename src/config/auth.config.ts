@@ -125,7 +125,23 @@ export const authConfig = {
                     if (error instanceof Error) {
                         console.error('[Auth] Error message:', error.message)
                         console.error('[Auth] Error cause:', error.cause)
+
+                        // Check if it's a network error (backend not running)
+                        const errorMessage = error.message.toLowerCase()
+                        const errorCause = error.cause as any
+
+                        if (errorMessage.includes('fetch failed') ||
+                            errorMessage.includes('failed to fetch') ||
+                            errorMessage.includes('networkerror') ||
+                            errorCause?.code === 'ECONNREFUSED' ||
+                            errorCause?.code === 'ENOTFOUND') {
+                            // Log connection error but return null
+                            // The login form will detect this and show appropriate message
+                            console.error('[Auth] Connection error detected - server may not be running')
+                            return null
+                        }
                     }
+                    // Return null for other errors - NextAuth will handle it
                     return null
                 }
             },
