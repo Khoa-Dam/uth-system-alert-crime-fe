@@ -8,7 +8,7 @@ export type VerificationCrimeReport = BaseCrimeReport & {
     disputeCount: number;
 };
 
-export type FilterType = 'all' | 'high_severity' | 'cuop_giat' | 'trom_cap';
+export type FilterType = 'all' | 'low' | 'medium' | 'high';
 
 export { VerificationLevel };
 
