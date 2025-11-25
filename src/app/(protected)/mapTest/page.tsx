@@ -2,7 +2,6 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { CrimeType } from '@/service/report.service';
 import { useLeaflet } from '@/hooks/use-leaflet';
 import { useCrimeReports } from '@/hooks/use-crime-reports';
 import ReportCard from './components/ReportCard';
@@ -16,11 +15,6 @@ const severityColorMap: Record<string, { hex: string; rgb: string }> = {
     high: { hex: '#ef4444', rgb: '239, 68, 68' },
 };
 
-const typeFilterMap: Partial<Record<FilterType, CrimeType>> = {
-    cuop_giat: CrimeType.CuopGiat,
-    trom_cap: CrimeType.TromCap,
-};
-
 const CrimeMap = () => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<any>(null);
@@ -32,8 +26,7 @@ const CrimeMap = () => {
     const [hasLocated, setHasLocated] = useState(false);
 
     const isLeafletLoaded = useLeaflet();
-    const typeFilter = typeFilterMap[filter];
-    const { reports, loading, error, actionState, confirmReport, disputeReport } = useCrimeReports(typeFilter, {
+    const { reports, loading, error, actionState, confirmReport, disputeReport } = useCrimeReports(undefined, {
         fallbackData: SAMPLE_DATA,
     });
 
@@ -109,8 +102,7 @@ const CrimeMap = () => {
     const filteredReports = useMemo(() => {
         return reports.filter((report) => {
             if (filter === 'all') return true;
-            if (filter === 'high_severity') return report.severityLevel === 'high';
-            return report.type === filter;
+            return report.severityLevel === filter;
         });
     }, [reports, filter]);
 
@@ -182,14 +174,14 @@ const CrimeMap = () => {
                 <FilterBtn active={filter === 'all'} onClick={() => setFilter('all')}>
                     Tất cả
                 </FilterBtn>
-                <FilterBtn active={filter === 'high_severity'} onClick={() => setFilter('high_severity')}>
+                <FilterBtn active={filter === 'high'} onClick={() => setFilter('high')}>
                     Nguy hiểm cao
                 </FilterBtn>
-                <FilterBtn active={filter === 'cuop_giat'} onClick={() => setFilter('cuop_giat')}>
-                    Cướp giật
+                <FilterBtn active={filter === 'medium'} onClick={() => setFilter('medium')}>
+                    Trung bình
                 </FilterBtn>
-                <FilterBtn active={filter === 'trom_cap'} onClick={() => setFilter('trom_cap')}>
-                    Trộm cắp
+                <FilterBtn active={filter === 'low'} onClick={() => setFilter('low')}>
+                    Thấp
                 </FilterBtn>
             </div>
 
