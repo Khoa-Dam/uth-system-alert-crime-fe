@@ -292,7 +292,7 @@ export default function SearchPage() {
                                     {searchResults.map((person) => (
                                         <div
                                             key={person.id}
-                                            className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 md:p-4 rounded-lg border border-border hover:bg-accent transition-colors"
+                                            className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-3 md:p-4 rounded-lg border border-border hover:bg-amber-500 transition-colors"
                                         >
                                             {/* Avatar */}
                                             <div className="flex items-start gap-3 sm:gap-4">

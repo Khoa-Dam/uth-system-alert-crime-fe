@@ -192,7 +192,7 @@ export default function Page() {
                                     <div className="grid gap-2 md:gap-3">
                                         <a
                                             href="/wanted"
-                                            className="flex items-center gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-accent"
+                                            className="flex items-center gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-amber-600"
                                         >
                                             <Users className="h-5 w-5 text-primary shrink-0" />
                                             <div className="min-w-0">
@@ -204,7 +204,7 @@ export default function Page() {
                                         </a>
                                         <a
                                             href="/reports"
-                                            className="flex items-center gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-accent"
+                                            className="flex items-center gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-amber-600"
                                         >
                                             <FileWarning className="h-5 w-5 text-primary shrink-0" />
                                             <div className="min-w-0">
@@ -216,7 +216,7 @@ export default function Page() {
                                         </a>
                                         <a
                                             href="/map"
-                                            className="flex items-center gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-accent"
+                                            className="flex items-center gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-amber-600"
                                         >
                                             <MapPin className="h-5 w-5 text-primary shrink-0" />
                                             <div className="min-w-0">
@@ -252,7 +252,7 @@ export default function Page() {
                                     {wantedPersons.map((person) => (
                                         <div
                                             key={person.id}
-                                            className="flex gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-accent"
+                                            className="flex gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-amber-600"
                                         >
                                             <div className="h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-lg bg-muted flex items-center justify-center">
                                                 <Users className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />

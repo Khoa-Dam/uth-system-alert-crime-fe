@@ -144,7 +144,7 @@ export default function StatisticsPage() {
                                             <div key={data.month} className="flex-1 flex flex-col items-center gap-1">
                                                 <div className="w-full flex gap-0.5 h-40 md:h-52 items-end">
                                                     <div
-                                                        className="flex-1 bg-primary/80 rounded-t transition-all hover:bg-primary"
+                                                        className="flex-1 bg-amber-600 rounded-t transition-all hover:bg-primary"
                                                         style={{ height: `${(data.new / maxMonthlyValue) * 100}%` }}
                                                         title={`Mới: ${data.new}`}
                                                     />
@@ -160,7 +160,7 @@ export default function StatisticsPage() {
                                     </div>
                                     <div className="flex items-center justify-center gap-4 md:gap-6 mt-4 text-xs md:text-sm">
                                         <div className="flex items-center gap-2">
-                                            <div className="h-3 w-3 rounded bg-primary" />
+                                            <div className="h-3 w-3 rounded bg-amber-600" />
                                             <span>Mới</span>
                                         </div>
                                         <div className="flex items-center gap-2">
@@ -221,7 +221,7 @@ export default function StatisticsPage() {
                                                 <span className="w-24 md:w-28 text-sm font-medium shrink-0">{age.group}</span>
                                                 <div className="flex-1 h-8 rounded-lg bg-muted overflow-hidden">
                                                     <div
-                                                        className="h-full bg-primary flex items-center justify-end pr-2 transition-all"
+                                                        className="h-full bg-amber-600 flex items-center justify-end pr-2 transition-all"
                                                         style={{ width: `${age.percentage}%` }}
                                                     >
                                                         <span className="text-xs text-primary-foreground font-medium">{age.count}</span>
@@ -248,7 +248,7 @@ export default function StatisticsPage() {
                                         {topProvinces.map((province, index) => (
                                             <div
                                                 key={province.name}
-                                                className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-accent transition-colors"
+                                                className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-amber-600 transition-colors"
                                             >
                                                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-sm">
                                                     {index + 1}
