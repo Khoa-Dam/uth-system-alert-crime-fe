@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site.config";
 import { fontHandwriting, fontHeading, fontMono, fontSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { SessionProvider } from "@/providers/session-provider";
+import { QueryProvider } from "@/providers/query-provider";
 
 export const viewport: Viewport = {
   viewportFit: "cover",
@@ -66,12 +67,14 @@ export default function RootLayout({ children }: React.PropsWithChildren) {
             "min-h-screen scroll-smooth font-sans antialiased selection:bg-foreground selection:text-background"
           )}
         >
-          <SessionProvider>
-            <main className="container mx-auto">
-              {children}
-            </main>
-            <Toaster />
-          </SessionProvider>
+          <QueryProvider>
+            <SessionProvider>
+              <main className="container mx-auto">
+                {children}
+              </main>
+              <Toaster />
+            </SessionProvider>
+          </QueryProvider>
 
         </body>
       </html>
