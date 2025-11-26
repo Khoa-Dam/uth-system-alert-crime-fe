@@ -1,106 +1,130 @@
-"use client"
+'use client';
 
-import { useState, useRef, useEffect } from "react"
-import { Bell, Settings, LogOut, ChevronDown } from "lucide-react"
-import { signOut } from "next-auth/react"
-import { useRouter } from "next/navigation"
-import { useUser } from "@/hooks/use-user"
-import { Logo } from "./icons"
+import React from 'react';
+import { Bell, LogOut, User, ShieldAlert, Menu } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useUser } from '@/hooks/use-user';
+
+// Import các component từ Shadcn UI
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
+import { useSidebarState } from './sidebar-context';
 
 export function AppHeader() {
-    const { userName, userRole } = useUser()
-    const router = useRouter()
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-    const dropdownRef = useRef<HTMLDivElement>(null)
-
-    // Đóng dropdown khi click bên ngoài
-    useEffect(() => {
-        function handleClickOutside(event: MouseEvent) {
-            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                setIsDropdownOpen(false)
-            }
-        }
-
-        document.addEventListener("mousedown", handleClickOutside)
-        return () => document.removeEventListener("mousedown", handleClickOutside)
-    }, [])
+    const { userName, userRole, isAuthenticated, isLoading } = useUser();
+    const router = useRouter();
+    const { toggle } = useSidebarState();
 
     const handleLogout = async () => {
         await signOut({
             redirect: false,
-            callbackUrl: "/login"
-        })
-        router.push("/login")
-        router.refresh()
-    }
+            callbackUrl: '/login',
+        });
+        router.push('/login');
+        router.refresh();
+    };
 
     return (
-        <header className="flex items-center justify-between bg-white shadow px-6 py-3 border-b">
-            {/* Bên trái: tiêu đề */}
-            <div className="space-y-1">
-                <h2 className="text-xl md:text-2xl font-bold tracking-tight">Chào mừng đến với <span className="text-red-600">CrimeLookup</span></h2>
-                <p className="text-sm md:text-base text-muted-foreground">
-                    Hệ thống tra cứu và quản lý thông tin tội phạm toàn quốc.
-                </p>
+        <header className="sticky top-0 z-40 flex items-center justify-between w-full border-b bg-background px-4 md:px-6 py-3 shadow-sm">
+            {/* Left side: Hamburger + Branding */}
+            <div className="flex items-center gap-2">
+                {/* Hamburger menu cho mobile */}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="md:hidden"
+                    onClick={toggle}
+                >
+                    <Menu className="h-5 w-5" />
+                </Button>
+
+                <Link href="/" className="flex items-center gap-2">
+                    <div className="bg-red-500 p-1.5 rounded-lg shadow-lg shadow-red-500/30">
+                        <ShieldAlert className="w-6 h-6 text-white" />
+                    </div>
+
+                    <h2 className="text-xl md:text-2xl font-bold tracking-tight">
+                        <span className="text-red-600">Guard</span>M
+                    </h2>
+                </Link>
             </div>
 
-            {/* Bên phải: avatar + tên người dùng */}
-            <div className="flex items-center gap-4">
-                {/* Icon thông báo */}
-                <button className="relative hover:text-amber-600 transition">
-                    <Bell size={20} />
-                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
+            {/* Actions bên phải */}
+            <div className="flex items-center gap-3 md:gap-4">
+                {isAuthenticated ? (
+                    <>
+                        {/* Nút Thông báo */}
+                        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-amber-600">
+                            <Bell className="h-5 w-5" />
+                            <span className="absolute top-2 right-2 h-2 w-2 bg-red-500 rounded-full animate-pulse" />
+                        </Button>
 
-                {/* User dropdown */}
-                <div className="relative" ref={dropdownRef}>
-                    <button
-                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                        className="flex items-center gap-3 hover:bg-gray-50 px-2 py-1 rounded-md transition"
-                    >
-                        <img
-                            src="https://i.pravatar.cc/40"
-                            alt="avatar"
-                            className="w-9 h-9 rounded-full border"
-                        />
-                        <div className="text-sm text-left hidden md:block">
-                            <p className="font-medium">{userName}</p>
-                            <p className="text-gray-500 text-xs">{userRole}</p>
-                        </div>
-                        <ChevronDown
-                            size={16}
-                            className={`text-gray-400 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                        />
-                    </button>
+                        {/* User Dropdown */}
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    className="relative h-10 w-10 rounded-full p-0 hover:bg-transparent focus-visible:ring-0"
+                                >
+                                    <Avatar className="h-9 w-9 border border-gray-200 transition hover:ring-2 hover:ring-red-100">
+                                        {/* Fallback luôn hiện vì không có AvatarImage */}
+                                        <AvatarFallback className="bg-gray-100">
+                                            <User className="h-5 w-5 text-gray-500" />
+                                        </AvatarFallback>
+                                    </Avatar>
+                                </Button>
+                            </DropdownMenuTrigger>
 
-                    {/* Dropdown menu */}
-                    {isDropdownOpen && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
-                            <div className="px-4 py-2 border-b border-gray-100 md:hidden">
-                                <p className="font-medium text-sm">{userName}</p>
-                                <p className="text-gray-500 text-xs">{userRole}</p>
-                            </div>
-                            <button
-                                onClick={() => {
-                                    setIsDropdownOpen(false)
-                                    router.push("/settings")
-                                }}
-                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition"
-                            >
-                                <Settings size={16} />
-                                <span>Cài đặt</span>
-                            </button>
-                            <button
-                                onClick={handleLogout}
-                                className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
-                            >
-                                <LogOut size={16} />
-                                <span>Đăng xuất</span>
-                            </button>
-                        </div>
-                    )}
-                </div>
+                            <DropdownMenuContent className="w-56" align="end" forceMount>
+                                <DropdownMenuLabel className="font-normal">
+                                    <div className="flex flex-col space-y-1">
+                                        <p className="text-sm font-medium leading-none">{userName || 'Administrator'}</p>
+                                        <p className="text-xs leading-none text-muted-foreground">{userRole || 'User'}</p>
+                                    </div>
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                <DropdownMenuItem
+                                    onClick={handleLogout}
+                                    className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                >
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Đăng xuất</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </>
+                ) : (
+                    <>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-sm hidden sm:inline-flex"
+                            onClick={() => router.push('/login')}
+                            disabled={isLoading}
+                        >
+                            Đăng nhập
+                        </Button>
+                        <Button
+                            size="sm"
+                            className="text-sm bg-red-600 hover:bg-red-700 text-white"
+                            onClick={() => router.push('/signup')}
+                            disabled={isLoading}
+                        >
+                            Đăng ký
+                        </Button>
+                    </>
+                )}
             </div>
         </header>
-    )
+    );
 }
