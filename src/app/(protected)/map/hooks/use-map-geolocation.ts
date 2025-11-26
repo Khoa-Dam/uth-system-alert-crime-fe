@@ -20,6 +20,8 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
     const [alertedReportIds, setAlertedReportIds] = useState<Set<string>>(new Set());
     const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
 
+    console.log('reports', alertedReportIds);
+
     const createUserMarker = (latitude: number, longitude: number, accuracy: number) => {
         const L = (window as any).L;
         const map = mapInstanceRef.current;
@@ -144,22 +146,25 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
             reports.forEach((report) => {
                 if (!report.lat || !report.lng) return;
                 const distance = getDistanceFromLatLonInMeters(latitude, longitude, report.lat, report.lng);
-                if (distance < 500) {
-                    setAlertedReportIds((prev) => {
-                        if (prev.has(report.id)) {
-                            return prev;
+                setAlertedReportIds((prev) => {
+                    const next = new Set(prev);
+                    if (distance < 500) {
+                        // Nếu trong vùng nguy hiểm và chưa cảnh báo
+                        if (!prev.has(report.id)) {
+                            setAlertMessage(
+                                `Bạn đang ở gần khu vực "${report.title}" (~${Math.round(distance)}m). Hãy cẩn thận!`
+                            );
+                            if (navigator.vibrate) {
+                                navigator.vibrate([400, 200, 400]);
+                            }
+                            next.add(report.id);
                         }
-                        setAlertMessage(
-                            `Bạn đang ở gần khu vực "${report.title}" (~${Math.round(distance)}m). Hãy cẩn thận!`
-                        );
-                        if (navigator.vibrate) {
-                            navigator.vibrate([400, 200, 400]);
-                        }
-                        const next = new Set(prev);
-                        next.add(report.id);
-                        return next;
-                    });
-                }
+                    } else {
+                        // Nếu rời xa khỏi vùng nguy hiểm, xóa để có thể cảnh báo lại khi quay lại
+                        next.delete(report.id);
+                    }
+                    return next;
+                });
             });
         };
 

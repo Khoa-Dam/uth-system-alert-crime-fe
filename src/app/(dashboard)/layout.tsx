@@ -1,11 +1,8 @@
 import { Metadata } from "next"
-import { auth } from "@/lib/auth"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import SidebarWrapper from "@/components/sidebar-wrapper"
 import { AppHeader } from "@/components/app-header"
 import { siteConfig } from "@/config/site.config"
-import { Logo } from "@/components/icons"
-import Link from "next/link"
 import { SidebarStateProvider } from "@/components/sidebar-context"
 
 export const metadata: Metadata = {

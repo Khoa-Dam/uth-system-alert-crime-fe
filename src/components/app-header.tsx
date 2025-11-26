@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Bell, LogOut, User, ShieldAlert, Menu } from 'lucide-react';
+import { LogOut, User, ShieldAlert, Menu } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/use-user';

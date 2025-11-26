@@ -1,7 +1,6 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Logo } from "@/components/icons";
 import { ShieldAlert } from "lucide-react";
 
 // import { Logo } from "@/components/icons";

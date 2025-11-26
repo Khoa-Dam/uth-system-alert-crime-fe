@@ -1,30 +1,40 @@
+
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState, Suspense } from 'react'; // 1. Thêm Suspense vào đây
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useLeaflet } from '@/hooks/use-leaflet';
-import { useCrimeReports, reportsKeys } from '@/hooks/use-crime-reports';
+import {
+    useReportsQuery,
+    reportsKeys,
+    useCreateReport,
+    useUpdateReport,
+    useDeleteReport,
+    useConfirmReport,
+    useDisputeReport
+} from '@/hooks/use-crime-reports';
 import ReportCard from './components/ReportCard';
 import { FilterBtn, DangerAlert, SearchBox, ReportForm } from './components';
 import { MapLegend } from './components/MapLegend';
 import { SAMPLE_DATA } from './mock-data';
-import { FilterType, VerificationCrimeReport, VerificationLevel } from '@/types/map';
+import { FilterType, VerificationCrimeReport } from '@/types/map';
 import { useMapInit, useMapGeolocation, useMapCrimeMarkers } from './hooks';
 import { reverseGeocode } from '@/utils/geocoding';
 import type { ReportLocationData, ReportFormPayload } from './components/ReportForm';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, MapPin, Loader2 } from 'lucide-react';
-import reportService from '@/service/report.service';
+import { Plus, Loader2 } from 'lucide-react';
 
-const CrimeMap = () => {
+// 2. Đổi tên component chính cũ thành CrimeMapContent
+const CrimeMapContent = () => {
+    // --- GIỮ NGUYÊN TOÀN BỘ LOGIC CŨ CỦA BẠN Ở ĐÂY ---
     const searchParams = useSearchParams();
     const queryClient = useQueryClient();
     const reportMarkerRef = useRef<any>(null);
-    const hasHandledQueryParams = useRef(false);
+    const hasHandledQueryParams = useRef<string>('');
 
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
     const [filter, setFilter] = useState<FilterType>('all');
@@ -33,11 +43,19 @@ const CrimeMap = () => {
     const [reportLocation, setReportLocation] = useState<ReportLocationData | null>(null);
     const [editingReportId, setEditingReportId] = useState<string | null>(null);
     const [isLoadingAddress, setIsLoadingAddress] = useState(false);
+    
+    // Action state for UI feedback
+    const [actionState, setActionState] = useState<{ id: string | null; type: string | null }>({ id: null, type: null });
 
     const isLeafletLoaded = useLeaflet();
-    const { reports, loading, error, actionState, confirmReport, disputeReport, addLocalReport, updateReport, deleteReport, updateLocalReport } = useCrimeReports(undefined, {
-        fallbackData: SAMPLE_DATA,
-    });
+    
+    // React Query Hooks
+    const { data: reports = SAMPLE_DATA, isLoading: loading, error } = useReportsQuery();
+    const createReportMutation = useCreateReport();
+    const updateReportMutation = useUpdateReport();
+    const deleteReportMutation = useDeleteReport();
+    const confirmReportMutation = useConfirmReport();
+    const disputeReportMutation = useDisputeReport();
 
     // Khởi tạo map
     const { mapContainerRef, mapInstanceRef, markersLayerRef } = useMapInit(isLeafletLoaded);
@@ -64,6 +82,7 @@ const CrimeMap = () => {
         markersLayerRef,
         reports: isReportingMode ? [] : filteredReports,
         onMarkerClick: (reportId) => setSelectedReportId(reportId),
+        selectedReportId,
     });
 
     // Xử lý click trên map để đóng report card
@@ -81,39 +100,54 @@ const CrimeMap = () => {
     // Xử lý lỗi
     useEffect(() => {
         if (error) {
-            toast.error(error);
+            toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra khi tải dữ liệu');
         }
     }, [error]);
 
     // Xử lý query params: focus hoặc edit report từ URL
     useEffect(() => {
-        if (hasHandledQueryParams.current || loading || !reports.length || !isLeafletLoaded) return;
+        if (loading || !reports.length || !isLeafletLoaded) return;
 
         const focusId = searchParams.get('focus');
         const editId = searchParams.get('edit');
+        const currentParams = searchParams.toString();
+
+        // Nếu params chưa thay đổi so với lần xử lý trước thì bỏ qua
+        if (hasHandledQueryParams.current === currentParams) return;
+
         const map = mapInstanceRef.current;
 
         if (focusId) {
             const report = reports.find((r) => r.id === focusId);
             if (report && report.lat && report.lng) {
-                // Focus vào report trên bản đồ
                 setSelectedReportId(focusId);
                 if (map) {
                     map.flyTo([report.lat, report.lng], 16, { duration: 1.5 });
                 }
-                hasHandledQueryParams.current = true;
+                hasHandledQueryParams.current = currentParams;
             } else if (report) {
-                // Report tồn tại nhưng không có tọa độ
                 setSelectedReportId(focusId);
-                hasHandledQueryParams.current = true;
+                hasHandledQueryParams.current = currentParams;
             }
         } else if (editId) {
             const report = reports.find((r) => r.id === editId);
             if (report) {
-                // Mở form edit cho report
                 handleEditReport(report);
-                hasHandledQueryParams.current = true;
+                hasHandledQueryParams.current = currentParams;
+            } else {
+                // Nếu không tìm thấy report (có thể do không thuộc về user hoặc lỗi)
+                // Chỉ hiện thông báo 1 lần
+                if (hasHandledQueryParams.current !== currentParams) {
+                   // toast.error('Không tìm thấy báo cáo hoặc bạn không có quyền chỉnh sửa');
+                   // Không set handled = true để có thể retry nếu data update? 
+                   // Nhưng nếu data đã load xong mà không thấy thì là không thấy.
+                   hasHandledQueryParams.current = currentParams;
+                }
             }
+        } else {
+            // No focus or edit param, but we should update ref to avoid stale state
+            // if user navigated from ?edit=1 to ?
+            hasHandledQueryParams.current = currentParams;
         }
     }, [searchParams, reports, loading, isLeafletLoaded, mapInstanceRef]);
 
@@ -125,9 +159,7 @@ const CrimeMap = () => {
                 map.removeLayer(reportMarkerRef.current);
                 reportMarkerRef.current = null;
             }
-            if (!showReportForm) {
-                setReportLocation(null);
-            }
+            // Removed auto-clear of reportLocation here to avoid race condition with handleEditReport
             return;
         }
 
@@ -196,7 +228,7 @@ const CrimeMap = () => {
         };
     }, [isReportingMode, showReportForm, isLeafletLoaded]);
 
-    const handleSelectSearchLocation = async (lat: number, lng: number, address: string) => {
+    const handleSelectSearchLocation = async (lat: number, lng: number) => {
         const map = mapInstanceRef.current;
         if (!map) return;
         map.flyTo([lat, lng], 16, { duration: 1.5 });
@@ -243,26 +275,27 @@ const CrimeMap = () => {
         attachments: data.attachments,
     });
 
+    const router = useRouter(); // Add useRouter
+
     const handleReportSubmit = async (data: ReportFormPayload) => {
         setIsSubmitting(true);
         try {
             const payload = buildReportPayload(data);
             if (editingReportId) {
-                const updated = await updateReport(editingReportId, payload);
-                updateLocalReport(updated);
+                await updateReportMutation.mutateAsync({ id: editingReportId, payload });
                 toast.success('Đã cập nhật báo cáo thành công');
             } else {
-                const created = await reportService.create(payload);
-                addLocalReport(created as unknown as VerificationCrimeReport);
+                const created = await createReportMutation.mutateAsync(payload);
                 toast.success('Đã gửi báo cáo thành công!');
                 setSelectedReportId(created.id);
             }
-            // Invalidate React Query caches so other pages see the change
-            queryClient.invalidateQueries({ queryKey: reportsKeys.all });
             setShowReportForm(false);
             setIsReportingMode(false);
             setReportLocation(null);
             setEditingReportId(null);
+            
+            // Clear query params
+            router.replace('/map');
         } catch (err: any) {
             console.error('Report submit error:', err);
             toast.error(err?.message || 'Không thể xử lý báo cáo');
@@ -275,23 +308,33 @@ const CrimeMap = () => {
         setIsReportingMode(false);
         setShowReportForm(false);
         setReportLocation(null);
+        setEditingReportId(null);
+        
+        // Clear query params
+        router.replace('/map');
     };
 
     const handleConfirm = async (id: string) => {
+        setActionState({ id, type: 'confirm' });
         try {
-            await confirmReport(id);
+            await confirmReportMutation.mutateAsync(id);
             toast.success('Đã gửi xác nhận (+5 điểm tin cậy)');
         } catch (err: any) {
             toast.error(err?.message || 'Không thể xác nhận báo cáo');
+        } finally {
+            setActionState({ id: null, type: null });
         }
     };
 
     const handleDispute = async (id: string) => {
+        setActionState({ id, type: 'dispute' });
         try {
-            await disputeReport(id);
+            await disputeReportMutation.mutateAsync(id);
             toast.error('Đã báo cáo sai lệch (-10 điểm tin cậy)');
         } catch (err: any) {
             toast.error(err?.message || 'Không thể báo cáo sai lệch');
+        } finally {
+            setActionState({ id: null, type: null });
         }
     };
 
@@ -300,9 +343,11 @@ const CrimeMap = () => {
         setSelectedReportId(null);
         // Set location for edit form
         if (report.lat && report.lng) {
+            const lat = Number(report.lat);
+            const lng = Number(report.lng);
             setReportLocation({
-                lat: report.lat,
-                lng: report.lng,
+                lat,
+                lng,
                 address: report.address || '',
                 addressDetails: {
                     city: report.district || '',
@@ -320,9 +365,7 @@ const CrimeMap = () => {
 
     const handleDeleteReport = async (id: string) => {
         try {
-            await deleteReport(id);
-            // Invalidate React Query caches so other pages (e.g. /reports) see the change
-            queryClient.invalidateQueries({ queryKey: reportsKeys.all });
+            await deleteReportMutation.mutateAsync(id);
             toast.success('Đã xóa báo cáo thành công');
             if (selectedReportId === id) {
                 setSelectedReportId(null);
@@ -495,5 +538,18 @@ const CrimeMap = () => {
     );
 };
 
-export default CrimeMap;
+// 3. Tạo wrapper component để export và xử lý Suspense
+const CrimeMap = () => {
+    return (
+        <Suspense fallback={
+            <div className="relative w-full h-[65vh] md:h-[600px] rounded-xl overflow-hidden shadow-xl border border-gray-200 bg-white flex flex-col items-center justify-center">
+                <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-3" />
+                <span className="text-sm font-semibold text-gray-600">Đang khởi tạo bản đồ...</span>
+            </div>
+        }>
+            <CrimeMapContent />
+        </Suspense>
+    );
+};
 
+export default CrimeMap;

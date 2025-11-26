@@ -12,14 +12,11 @@ import {
     Users,
     FileWarning,
     MapPin,
-    TrendingUp,
     AlertTriangle,
-    Clock,
     Shield,
     Eye,
     Bell,
     Globe,
-    FilePlus,
     ShieldCheck,
 } from 'lucide-react';
 import {
@@ -38,36 +35,6 @@ import { HomeWantedCriminal } from '@/service/home.service';
 import { useHomeData } from '@/hooks/use-home-data';
 import { useStatistics, useHeatmap } from '@/hooks/use-statistics';
 
-const recentActivities = [
-    {
-        id: 1,
-        type: 'Cập nhật',
-        message: 'Thêm mới đối tượng truy nã #TN-2025-0089',
-        time: '5 phút trước',
-        status: 'new',
-    },
-    {
-        id: 2,
-        type: 'Báo cáo',
-        message: 'Phát hiện đối tượng tại quận Cầu Giấy',
-        time: '15 phút trước',
-        status: 'pending',
-    },
-    {
-        id: 3,
-        type: 'Bắt giữ',
-        message: 'Đối tượng #TN-2025-0045 đã bị bắt',
-        time: '1 giờ trước',
-        status: 'success',
-    },
-    {
-        id: 4,
-        type: 'Cảnh báo',
-        message: 'Điểm nóng mới phát hiện tại quận Hoàng Mai',
-        time: '2 giờ trước',
-        status: 'warning',
-    },
-];
 
 const systemNotices = [
     {

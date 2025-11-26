@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,7 +23,7 @@ export default function WantedPage() {
     const { data, isLoading, error, refetch, isFetching } = useWantedCriminals();
     const [search, setSearch] = useState('');
     const [crimeFilter, setCrimeFilter] = useState('');
-    const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+    const [loadMoreCount, setLoadMoreCount] = useState(0);
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     const crimes = useMemo(() => {
@@ -47,16 +47,27 @@ export default function WantedPage() {
         });
     }, [data, search, crimeFilter]);
 
-    // Reset visible count when filters change
-    useEffect(() => {
-        setVisibleCount(ITEMS_PER_PAGE);
-    }, [search, crimeFilter]);
+    // Reset loadMoreCount when filters change - handled in onChange handlers
+    const handleSearchChange = (value: string) => {
+        setSearch(value);
+        if (loadMoreCount > 0) {
+            setLoadMoreCount(0);
+        }
+    };
 
+    const handleCrimeFilterChange = (value: string) => {
+        setCrimeFilter(value);
+        if (loadMoreCount > 0) {
+            setLoadMoreCount(0);
+        }
+    };
+
+    const visibleCount = ITEMS_PER_PAGE + loadMoreCount * ITEMS_PER_PAGE;
     const displayedList = useMemo(() => filteredList.slice(0, visibleCount), [filteredList, visibleCount]);
     const hasMore = filteredList.length > visibleCount;
 
     const handleLoadMore = useCallback(() => {
-        setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
+        setLoadMoreCount((prev) => prev + 1);
     }, []);
 
     // Infinite scroll: tự động load thêm khi sentinel vào viewport
@@ -137,14 +148,14 @@ export default function WantedPage() {
                                 placeholder="Tìm kiếm tên, tội danh, địa chỉ..."
                                 className="pl-9"
                                 value={search}
-                                onChange={(e) => setSearch(e.target.value)}
+                                onChange={(e) => handleSearchChange(e.target.value)}
                             />
                         </div>
                         <div className="flex gap-2">
                             <select
                                 className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
                                 value={crimeFilter}
-                                onChange={(e) => setCrimeFilter(e.target.value)}
+                                onChange={(e) => handleCrimeFilterChange(e.target.value)}
                             >
                                 <option value="">Tất cả tội danh</option>
                                 {crimes.map((crime) => (
@@ -154,7 +165,7 @@ export default function WantedPage() {
                                 ))}
                             </select>
                             {crimeFilter && (
-                                <Button variant="ghost" onClick={() => setCrimeFilter('')}>
+                                <Button variant="ghost" onClick={() => handleCrimeFilterChange('')}>
                                     Xóa
                                 </Button>
                             )}

@@ -10,6 +10,7 @@ interface UseMapCrimeMarkersProps {
     markersLayerRef: React.MutableRefObject<any>;
     reports: VerificationCrimeReport[];
     onMarkerClick: (reportId: string) => void;
+    selectedReportId?: string | null;
 }
 
 // Màu marker dựa trên mức độ nghiêm trọng (severityLevel)
@@ -25,6 +26,7 @@ export const useMapCrimeMarkers = ({
     markersLayerRef,
     reports,
     onMarkerClick,
+    selectedReportId,
 }: UseMapCrimeMarkersProps) => {
     useEffect(() => {
         const L = (window as any).L;
@@ -35,6 +37,8 @@ export const useMapCrimeMarkers = ({
         reports.forEach((report) => {
             if (!report.lat || !report.lng) return;
 
+            const isSelected = report.id === selectedReportId;
+
             // Màu marker được quyết định bởi mức độ nghiêm trọng (severityLevel)
             const color = severityColorMap[report.severityLevel] ?? severityColorMap.low;
 
@@ -43,31 +47,41 @@ export const useMapCrimeMarkers = ({
             );
             const isUnverified = report.verificationLevel === VerificationLevel.UNVERIFIED;
 
-            const size = isVerified ? 22 : 16; // Tăng size để rõ hơn
+            // Tăng size nếu được chọn
+            let size = isVerified ? 22 : 16;
+            if (isSelected) size = 32; // Size lớn hơn hẳn khi được chọn
+
             const markerClass = isUnverified ? 'base-marker marker-unverified' : 'base-marker';
+            
+            // Style đặc biệt cho marker được chọn
+            const selectedStyle = isSelected 
+                ? `border: 3px solid #3b82f6; z-index: 1000; transform: scale(1.1); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), ${color.shadow};` 
+                : `box-shadow:${color.shadow}, 0 2px 4px rgba(0,0,0,0.2);`;
+
             const html = `
         <div style="position: relative; width: ${size}px; height: ${size}px;">
-          ${isVerified ? `<div class="pulse-ring" style="--color-rgb:${color.rgb}"></div>` : ''}
-          <div class="${markerClass}" style="background-color:${color.hex} !important;width:100%;height:100%;box-shadow:${color.shadow}, 0 2px 4px rgba(0,0,0,0.2);"></div>
+          ${isVerified || isSelected ? `<div class="pulse-ring" style="--color-rgb:${isSelected ? '59, 130, 246' : color.rgb}; width: ${size*2}px; height: ${size*2}px; top: -${size/2}px; left: -${size/2}px;"></div>` : ''}
+          <div class="${markerClass}" style="background-color:${color.hex} !important;width:100%;height:100%;${selectedStyle}"></div>
         </div>`;
 
             const marker = L.marker([report.lat, report.lng], {
                 icon: L.divIcon({
-                    className: 'custom-div-icon',
+                    className: isSelected ? 'custom-div-icon selected-marker-icon' : 'custom-div-icon',
                     html,
                     iconSize: [size, size],
                     iconAnchor: [size / 2, size / 2],
                 }),
+                zIndexOffset: isSelected ? 1000 : 0, // Đưa marker được chọn lên trên cùng
             });
 
             marker.on('click', (e: any) => {
                 L.DomEvent.stopPropagation(e);
                 onMarkerClick(report.id);
-                mapInstanceRef.current.flyTo([report.lat, report.lng], 15, { duration: 1 });
+                mapInstanceRef.current.flyTo([report.lat, report.lng], 16, { duration: 1 });
             });
 
             markersLayerRef.current.addLayer(marker);
         });
-    }, [reports, isLeafletLoaded, mapInstanceRef, markersLayerRef, onMarkerClick]);
+    }, [reports, isLeafletLoaded, mapInstanceRef, markersLayerRef, onMarkerClick, selectedReportId]);
 };
 

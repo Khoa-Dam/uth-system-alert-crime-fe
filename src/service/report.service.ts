@@ -137,6 +137,17 @@ export interface VoteStatus {
 }
 
 class ReportService {
+    private handleError(error: any, defaultMessage: string): never {
+        const errorData = error?.response?.data;
+        const errorMessage =
+            errorData?.message ||
+            errorData?.error ||
+            (errorData && typeof errorData === 'string' ? errorData : null) ||
+            error?.message ||
+            defaultMessage;
+        throw new Error(errorMessage);
+    }
+
     /**
      * Create a new crime report
      * Requires authentication
@@ -149,14 +160,7 @@ class ReportService {
             );
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                (errorData && typeof errorData === 'string' ? errorData : null) ||
-                error?.message ||
-                'Không thể tạo báo cáo. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tạo báo cáo. Vui lòng thử lại.');
         }
     }
 
@@ -169,13 +173,7 @@ class ReportService {
             const { data } = await apiClient.get<CrimeReportResponse[]>(`${REPORT_BASE}${query}`);
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải danh sách báo cáo. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải danh sách báo cáo. Vui lòng thử lại.');
         }
     }
 
@@ -187,13 +185,7 @@ class ReportService {
             const { data } = await apiClient.post<CrimeReportResponse>(`${REPORT_BASE}/${id}/confirm`);
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể xác nhận báo cáo. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể xác nhận báo cáo. Vui lòng thử lại.');
         }
     }
 
@@ -205,13 +197,7 @@ class ReportService {
             const { data } = await apiClient.post<CrimeReportResponse>(`${REPORT_BASE}/${id}/dispute`);
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể báo cáo sai lệch. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể báo cáo sai lệch. Vui lòng thử lại.');
         }
     }
 
@@ -223,13 +209,7 @@ class ReportService {
             const { data } = await apiClient.put<CrimeReportResponse>(`${REPORT_BASE}/${id}/verify`);
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể xác minh báo cáo. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể xác minh báo cáo. Vui lòng thử lại.');
         }
     }
 
@@ -246,13 +226,7 @@ class ReportService {
             if (error?.response?.status === 404) {
                 throw new Error('Không tìm thấy báo cáo');
             }
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải báo cáo. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải báo cáo. Vui lòng thử lại.');
         }
     }
 
@@ -266,13 +240,7 @@ class ReportService {
             );
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải báo cáo theo quận. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải báo cáo theo quận. Vui lòng thử lại.');
         }
     }
 
@@ -286,13 +254,7 @@ class ReportService {
             );
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải báo cáo theo tỉnh/thành phố. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải báo cáo theo tỉnh/thành phố. Vui lòng thử lại.');
         }
     }
 
@@ -306,13 +268,7 @@ class ReportService {
             );
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải dữ liệu heatmap. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải dữ liệu heatmap. Vui lòng thử lại.');
         }
     }
 
@@ -326,13 +282,7 @@ class ReportService {
             );
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải thống kê. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải thống kê. Vui lòng thử lại.');
         }
     }
 
@@ -361,13 +311,7 @@ class ReportService {
             );
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải cảnh báo gần đây. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải cảnh báo gần đây. Vui lòng thử lại.');
         }
     }
 
@@ -380,13 +324,7 @@ class ReportService {
             const { data } = await apiClient.get<CrimeReportResponse[]>(`${REPORT_BASE}/me`);
             return data;
         } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải danh sách báo cáo của bạn. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải danh sách báo cáo của bạn. Vui lòng thử lại.');
         }
     }
 
@@ -416,13 +354,7 @@ class ReportService {
             if (error?.response?.status === 404) {
                 throw new Error('Không tìm thấy báo cáo');
             }
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể cập nhật báo cáo. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể cập nhật báo cáo. Vui lòng thử lại.');
         }
     }
 
@@ -441,13 +373,7 @@ class ReportService {
             if (error?.response?.status === 404) {
                 throw new Error('Không tìm thấy báo cáo');
             }
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể xóa báo cáo. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể xóa báo cáo. Vui lòng thử lại.');
         }
     }
 
@@ -470,13 +396,7 @@ class ReportService {
                     isOwner: false,
                 };
             }
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải trạng thái vote. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+            this.handleError(error, 'Không thể tải trạng thái vote. Vui lòng thử lại.');
         }
     }
 
