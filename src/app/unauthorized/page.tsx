@@ -1,5 +1,5 @@
+import { Logo } from '@/components/icons';
 import { Button } from '@/components/ui/button';
-import { ShieldAlert } from 'lucide-react';
 import Link from 'next/link';
 
 export default function UnauthorizedPage() {
@@ -8,7 +8,7 @@ export default function UnauthorizedPage() {
             <div className="bg-white p-8 rounded-lg shadow-lg text-center max-w-md w-full space-y-6">
                 <div className="flex justify-center">
                     <div className="bg-red-100 p-4 rounded-full">
-                        <ShieldAlert className="w-12 h-12 text-red-600" />
+                        <Logo className="w-12 h-12 text-red-600" />
                     </div>
                 </div>
                 

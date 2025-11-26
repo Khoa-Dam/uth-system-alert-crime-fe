@@ -2,8 +2,8 @@
 
 import React from 'react';
 
-import { ShieldAlert } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
+import { Logo } from '@/components/icons';
 
 export const LandingFooter: React.FC = () => {
     return (
@@ -11,7 +11,7 @@ export const LandingFooter: React.FC = () => {
             <Separator className="bg-slate-200 mb-8" />
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-slate-500 text-sm">
                 <div className="flex items-center gap-2 font-semibold text-slate-900">
-                    <ShieldAlert className="w-5 h-5 text-red-500" />
+                    <Logo className="w-5 h-5 text-red-500" />
                     GuardM
                 </div>
                 <div className="flex gap-8">

@@ -12,8 +12,9 @@ import authService from "@/service/auth.service"
 import { signUp } from "@/utils/validation"
 import { toast } from "sonner"
 import { signIn } from "next-auth/react"
-import { Loader2, ShieldAlert } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import Link from "next/link"
+import { Logo } from "@/components/icons"
 
 export function SignupForm({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
     const router = useRouter()
@@ -124,7 +125,7 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
                 className="flex sm:hidden  gap-2 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
                 <div className="bg-red-500 p-1.5 rounded-lg shadow-lg shadow-red-500/30">
-                    <ShieldAlert className="w-6 h-6 text-white" />
+                    <Logo className="w-6 h-6 text-white" />
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold tracking-tight">
                     <span className="text-red-600">GuardM</span>

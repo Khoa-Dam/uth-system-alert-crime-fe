@@ -1,6 +1,6 @@
 'use client';
 
-import { LogOut, User, ShieldAlert, Menu } from 'lucide-react';
+import { LogOut, User, Menu } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@/hooks/use-user';
@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 import { useSidebarState } from './sidebar-context';
+import { Logo } from './icons';
 
 export function AppHeader() {
     const { userName, userRole, isAuthenticated, isLoading } = useUser();
@@ -49,7 +50,7 @@ export function AppHeader() {
 
                 <Link href="/dashboard" className="flex items-center gap-2">
                     <div className="bg-red-500 p-1.5 rounded-lg shadow-lg shadow-red-500/30">
-                        <ShieldAlert className="w-6 h-6 text-white" />
+                        <Logo className="w-6 h-6 text-white" />
                     </div>
 
                     <h2 className="text-xl md:text-2xl font-bold tracking-tight">

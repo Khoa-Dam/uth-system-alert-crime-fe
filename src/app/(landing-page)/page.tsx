@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ChevronRight, ShieldAlert, Menu, X } from 'lucide-react';
+import { ChevronRight,Menu, X } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ import { FeaturesSection } from './components/features';
 import { SecuritySection } from './components/security';
 import { LandingFooter } from './components/footer';
 import { env } from '@/lib/env';
+import { Logo } from '@/components/icons';
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -39,7 +40,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tighter text-slate-900">
             <div className="bg-red-500 p-1.5 rounded-lg shadow-lg shadow-red-500/30">
-              <ShieldAlert className="w-6 h-6 text-white" />
+              <Logo className="w-6 h-6 text-white" />
             </div>
             <span>
               Guard<span className="text-red-500">M</span>
@@ -57,7 +58,7 @@ export default function LandingPage() {
 
           <div className="hidden md:block">
             <Button asChild size="sm" className="shadow-lg shadow-red-500/20">
-              <a href={APP_URL} className="flex items-center gap-2">
+              <a href={APP_URL + "/dashboard"} className="flex items-center gap-2">
                 Mở App <ChevronRight className="w-4 h-4" />
               </a>
             </Button>
@@ -77,7 +78,7 @@ export default function LandingPage() {
           <Card className="md:hidden absolute top-full left-0 w-full rounded-none border-slate-200 bg-white">
             <CardContent className="p-6 flex flex-col gap-4">
               <Button asChild className="w-full">
-                <a href={APP_URL}>Mở App</a>
+                <a href={APP_URL + "/dashboard"}>Mở App</a>
               </Button>
               <Button
                 variant="outline"
@@ -91,7 +92,7 @@ export default function LandingPage() {
         )}
       </Link>
 
-      <HeroSection appUrl={APP_URL} />
+      <HeroSection appUrl={APP_URL + "/dashboard"} />
       <StatsSection />
       <FeaturesSection />
       <SecuritySection />
