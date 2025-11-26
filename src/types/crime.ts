@@ -1,5 +1,18 @@
 import { VerificationLevel } from './verification';
 
+export enum CrimeType {
+    TRUY_NA = "truy_na", // Truy nã
+    NGHI_PHAM = "nghi_pham", // Nghi phạm
+    DANG_NGO = "dang_ngo", // Đáng ngờ
+    DE_DOA = "de_doa", // Đe dọa
+    GIET_NGUOI = "giet_nguoi", // Giết người
+    BAT_COC = "bat_coc", // Bắt cóc
+    CUOP_GIAT = "cuop_giat", // Cướp giật
+    TROM_CAP = "trom_cap", // Trộm cắp
+}
+
+
+
 export interface CrimeReport {
     id: string;
     reporterId?: string;
@@ -30,3 +43,14 @@ export interface CrimeReport {
     updatedAt: string | Date;
 }
 
+
+export const crimeTypeLabels: Record<CrimeType, string> = {
+    [CrimeType.TRUY_NA]: "Truy nã",
+    [CrimeType.NGHI_PHAM]: "Nghi phạm",
+    [CrimeType.DANG_NGO]: "Đáng ngờ",
+    [CrimeType.DE_DOA]: "Đe dọa",
+    [CrimeType.GIET_NGUOI]: "Giết người",
+    [CrimeType.BAT_COC]: "Bắt cóc",
+    [CrimeType.CUOP_GIAT]: "Cướp giật",
+    [CrimeType.TROM_CAP]: "Trộm cắp",
+}
