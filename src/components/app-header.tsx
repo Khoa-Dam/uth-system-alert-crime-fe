@@ -47,7 +47,7 @@ export function AppHeader() {
                     <Menu className="h-5 w-5" />
                 </Button>
 
-                <Link href="/" className="flex items-center gap-2">
+                <Link href="/dashboard" className="flex items-center gap-2">
                     <div className="bg-red-500 p-1.5 rounded-lg shadow-lg shadow-red-500/30">
                         <ShieldAlert className="w-6 h-6 text-white" />
                     </div>

@@ -26,12 +26,12 @@ export default function Sidebar({
     const { data: homeData, isLoading: homeLoading } = useHomeData()
 
     const navItems = [
-        { label: "Luồng Tin Trực tiếp", href: "/", icon: Home },
+        { label: "Luồng Tin Trực tiếp", href: "/dashboard", icon: Home },
         { label: "Danh Sách Truy Nã", href: "/wanted", icon: ShieldX },
         { label: "Thời Tiết & Thiên Tai", href: "/weather", icon: CloudRain },
         { label: "Bản Đồ", href: "/map", icon: MapPin },
         { label: "Báo Cáo", href: "/reports", icon: MessageSquareWarning },
-        { label: "landing-page", href: "/landing-page", icon: Globe },
+        { label: "landing-page", href: "/", icon: Globe },
 
     ]
 

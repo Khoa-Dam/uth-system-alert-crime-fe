@@ -1,11 +1,10 @@
 /**
  * An array of routes that are accessible to the public
  * These routes do not require authentication
- * Note: "/" redirects to /dashboard if user is logged in
  */
 export const publicRoutes = [
-    "/", // Trang chủ - public, không cần auth
-    "/landing-page", // Trang giới thiệu hệ thống
+    "/", // Landing page - public
+    "/dashboard", // Dashboard - public, không cần đăng nhập
     "/weather",
     "/wanted",
     "/terms",
@@ -47,12 +46,12 @@ export const officerRoutes = [
 /**
  * The default redirect path after a user logs in
  */
-export const DEFAULT_LOGIN_REDIRECT = "/";
+export const DEFAULT_LOGIN_REDIRECT = "/dashboard";
 
 /**
  * The default redirect path after a user logs out
  */
-export const DEFAULT_LOGOUT_REDIRECT = "/login";
+export const DEFAULT_LOGOUT_REDIRECT = "/";
 
 /**
  * The redirect path for unauthorized access

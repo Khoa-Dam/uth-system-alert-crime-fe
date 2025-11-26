@@ -136,7 +136,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             {/* Logo với link về trang chủ */}
             <Link
-                href="/"
+                href="/dashboard"
                 aria-label="Về trang chủ"
                 className="flex sm:hidden  gap-2 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >

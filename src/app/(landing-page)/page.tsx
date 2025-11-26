@@ -17,7 +17,7 @@ export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const APP_URL = 'https://crime-alert-app.vercel.app';
+  const APP_URL = 'https://guard-m-fe.vercel.app/dashboard';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,7 +29,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-linear-to-b from-white via-slate-50 to-slate-100 text-slate-900 font-sans selection:bg-red-500 selection:text-white overflow-x-hidden">
-      <Link href="/"
+      <Link href="/dashboard"
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
           ? 'bg-white/85 backdrop-blur-lg border-b border-slate-200/70 shadow-sm py-3'
           : 'bg-transparent py-5'
