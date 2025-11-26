@@ -12,12 +12,13 @@ import { StatsSection } from './components/stats';
 import { FeaturesSection } from './components/features';
 import { SecuritySection } from './components/security';
 import { LandingFooter } from './components/footer';
+import { env } from '@/lib/env';
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const APP_URL = 'https://guard-m-fe.vercel.app/dashboard';
+  const APP_URL = env.NEXT_PUBLIC_APP_URL ?? 'https://localhost:3000';
 
   useEffect(() => {
     const handleScroll = () => {

@@ -154,3 +154,21 @@ export function useDeleteReport() {
     });
 }
 
+/**
+ * Mutation hook for admin verifying a report (Admin only)
+ */
+export function useAdminVerifyReport() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => reportService.verifyReport(id),
+        onSuccess: (data) => {
+            const normalized = normalizeReport(data);
+            // Update all report lists
+            queryClient.setQueriesData<VerificationCrimeReport[]>(
+                { queryKey: reportsKeys.lists() },
+                (old) => old?.map((r) => (r.id === normalized.id ? normalized : r))
+            );
+        },
+    });
+}

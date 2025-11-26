@@ -69,9 +69,9 @@ export const authConfig = {
                 }
 
                 try {
-                    const apiUrl = env.API_BASE_URL.endsWith('/api')
-                        ? `${env.API_BASE_URL}/auth/login`
-                        : `${env.API_BASE_URL}/api/auth/login`
+                    const apiUrl = env.NEXT_PUBLIC_API_BASE_URL.endsWith('/api')
+                        ? `${env.NEXT_PUBLIC_API_BASE_URL}/auth/login`
+                        : `${env.NEXT_PUBLIC_API_BASE_URL}/api/auth/login`
 
                     const response = await fetch(apiUrl, {
                         method: 'POST',

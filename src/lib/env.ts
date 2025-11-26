@@ -6,6 +6,7 @@ export const env = createEnv({
      * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
      * useful for Docker builds.
      */
+    
     skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 
     /**
@@ -37,7 +38,7 @@ export const env = createEnv({
             process.env.VERCEL ? z.string() : z.string().url().optional()
         ),
 
-        API_BASE_URL: z.string().url().min(1, { message: "API Base URL is invalid or missing" }),
+
     },
 
     /**
@@ -47,6 +48,7 @@ export const env = createEnv({
      */
     client: {
         NEXT_PUBLIC_API_BASE_URL: z.string().url().min(1, { message: "API Base URL is invalid or missing" }),
+        NEXT_PUBLIC_APP_URL: z.string().url().optional(),
     },
 
     /**
@@ -56,6 +58,7 @@ export const env = createEnv({
      */
     experimental__runtimeEnv: {
         NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
+        NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     },
 
     /**
