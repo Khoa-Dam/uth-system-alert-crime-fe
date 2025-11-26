@@ -49,7 +49,7 @@ export default auth((req) => {
 
     // Admin routes - require admin role
     if (isAdminRoute(pathname)) {
-        if (userRole !== 'admin') {
+        if (userRole !== 'admin' && userRole !== 'Admin') {
             return NextResponse.redirect(new URL(UNAUTHORIZED_REDIRECT, nextUrl))
         }
         return NextResponse.next()
@@ -57,7 +57,7 @@ export default auth((req) => {
 
     // Officer routes - require officer or admin role
     if (isOfficerRoute(pathname)) {
-        if (!userRole || !['admin', 'officer'].includes(userRole)) {
+        if (!userRole || !['admin', 'officer', 'Admin', 'Officer'].includes(userRole)) {
             return NextResponse.redirect(new URL(UNAUTHORIZED_REDIRECT, nextUrl))
         }
         return NextResponse.next()
