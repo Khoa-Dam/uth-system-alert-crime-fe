@@ -1,73 +1,115 @@
-"use client";
+'use client';
 
-import { ArrowRight, Shield, AlertTriangle } from "lucide-react";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import React, { useEffect, useRef, useState } from 'react';
+import { ChevronRight, Globe } from 'lucide-react';
 
-export function Hero() {
-  return (
-    <section
-      id="hero"
-      className="relative flex min-h-[90vh] w-full flex-col items-center justify-center overflow-hidden text-center"
-    >
-      {/* Background gradient */}
-      <div className="absolute inset-0 -z-10 bg-linear-to-b from-background via-background to-muted/20" />
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_50%_50%,rgba(245,158,11,0.1),transparent_50%)]" />
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
-      <div className="container mx-auto flex max-w-5xl flex-col items-center gap-8">
-        <div className="group relative inline-flex items-center gap-2 rounded-full border bg-amber-50 dark:bg-amber-950/50 px-4 py-2 text-sm backdrop-blur-sm transition-all hover:scale-105">
-          <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-500" />
-          <span className="font-medium text-amber-800 dark:text-amber-200">Hệ thống cảnh báo tội phạm toàn quốc</span>
-        </div>
+const GLOBE_SIZE = 450;
+const GLOBE_RADIUS = GLOBE_SIZE / 2;
+const MAP_CIRCUMFERENCE = 2 * Math.PI * GLOBE_RADIUS;
 
-        <h1 className="font-merriweather text-5xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-          Hệ thống cảnh báo tội phạm
-          <br />
-        </h1>
-
-        <p className="max-w-2xl text-lg text-muted-foreground sm:text-xl">
-          Hệ thống tra cứu tội phạm truy nã và cảnh báo an toàn. Báo cáo sự cố, xem bản đồ cảnh báo,
-          và tra cứu thông tin tội phạm để bảo vệ bạn và cộng đồng.
-        </p>
-
-        <div className="flex flex-col items-center gap-4 sm:flex-row">
-          <Link
-            href="/dashboard"
-            className={cn(
-              buttonVariants({ size: "lg" }),
-              "group gap-2 text-lg shadow-lg transition-all hover:scale-105 bg-amber-600 hover:bg-amber-700"
-            )}
-          >
-            Tra cứu ngay
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-          <Link
-            href="/signup"
-            className={cn(
-              buttonVariants({ size: "lg", variant: "outline" }),
-              "text-lg transition-all hover:scale-105"
-            )}
-          >
-            Đăng ký tài khoản
-          </Link>
-        </div>
-
-        <div className="mt-12 flex items-center gap-8 text-sm text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-amber-600" />
-            <span>Miễn phí sử dụng</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-amber-600" />
-            <span>Bảo mật thông tin</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Shield className="h-4 w-4 text-amber-600" />
-            <span>Cập nhật thời gian thực</span>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+interface HeroProps {
+    appUrl: string;
 }
+
+const CustomTechEarth = () => {
+    const [rotation, setRotation] = useState(0);
+    const requestRef = useRef<number | null>(null);
+
+    const animate = () => {
+        setRotation((prev) => prev + 0.002);
+        requestRef.current = requestAnimationFrame(animate);
+    };
+
+    useEffect(() => {
+        requestRef.current = requestAnimationFrame(animate);
+        return () => {
+            if (requestRef.current) {
+                cancelAnimationFrame(requestRef.current);
+            }
+        };
+    }, []);
+
+    const rotationRatio = (rotation % (2 * Math.PI)) / (2 * Math.PI);
+    const bgPosition = rotationRatio * MAP_CIRCUMFERENCE;
+
+    return (
+        <div
+            className="relative flex items-center justify-center aspect-square w-full max-w-[450px] md:max-w-[500px] transform scale-90 md:scale-100 transition-transform duration-500"
+        >
+            <div className="absolute inset-0 rounded-full bg-[#0EA5E9] overflow-hidden border border-slate-200/60">
+                <div
+                    className="absolute top-0 left-0 h-full opacity-55"
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        backgroundImage:
+                            "url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png')",
+                        backgroundSize: `${MAP_CIRCUMFERENCE}px 100%`,
+                        backgroundRepeat: 'repeat-x',
+                        backgroundPosition: `${-bgPosition}px center`,
+                        filter: 'saturate(1.2)',
+                    }}
+                ></div>
+
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[45px_45px] rounded-full opacity-20"></div>
+                <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_60%,rgba(0,0,0,0.8)_100%)] pointer-events-none"></div>
+            </div>
+
+            <div className="absolute inset-[-2px] rounded-full border border-blue-500/30 blur-[1px]"></div>
+            <div className="absolute inset-[-30px] rounded-full bg-blue-500/10 blur-2xl -z-10"></div>
+        </div>
+    );
+};
+
+export const HeroSection: React.FC<HeroProps> = ({ appUrl }) => {
+    return (
+        <section className="relative pt-15 pb-10 px-6 lg:h-screen min-h-[800px] flex items-center overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-white via-blue-50 to-indigo-100 -z-20"></div>
+            <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-blue-200/40 rounded-full blur-[160px] -z-10 pointer-events-none"></div>
+
+            <div className="max-w-7xl mx-auto w-full sm:px-6 py-10 flex flex-col sm:grid lg:grid-cols-2 gap-10 items-center h-full">
+                <div className="space-y-2 z-10">
+                    <Badge
+                        variant="outline"
+                        className="bg-red-100 text-red-600 border-red-200 font-semibold uppercase tracking-wider px-3 "
+                    >
+                        Global Monitoring
+                    </Badge>
+
+                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 leading-[1.1] tracking-tight">
+                        Bản đồ cảnh báo tội phạm
+                    </h1>
+
+                    <p className="text-slate-600 text-base sm:text-lg  max-w-lg leading-relaxed">
+                        GuardM không chỉ là landing page demo, mà là bộ ứng dụng hoàn chỉnh gồm
+                        dashboard thống kê, bản đồ tội phạm, báo cáo người dân, danh sách truy nã
+                        và cảnh báo thời tiết được kết nối với dữ liệu thật.
+                    </p>
+
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                        <Button
+                            asChild
+                            size="lg"
+                            className="text-base font-semibold shadow-[0_0_25px_rgba(220,38,38,0.4)]"
+                        >
+                            <a href={appUrl} className="flex items-center gap-2">
+                                Truy cập ứng dụng
+                                <ChevronRight className="w-5 h-5" />
+                            </a>
+                        </Button>
+
+                    </div>
+                </div>
+
+                <div id="demo" className="relative h-[400px] lg:h-[600px] w-full flex items-center justify-center perspective-1000">
+                    <CustomTechEarth />
+                </div>
+            </div>
+        </section>
+    );
+}
+
+

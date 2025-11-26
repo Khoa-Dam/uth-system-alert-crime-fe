@@ -1,58 +1,38 @@
-"use client";
+'use client';
 
-import { AlertTriangle, MapPin, Users, FileText } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import React from 'react';
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const stats = [
-    {
-        icon: AlertTriangle,
-        value: "1000+",
-        label: "Báo cáo",
-        description: "Báo cáo tội phạm đã được gửi",
-    },
-    {
-        icon: MapPin,
-        value: "63",
-        label: "Tỉnh/Thành",
-        description: "Phủ sóng toàn quốc",
-    },
-    {
-        icon: Users,
-        value: "5000+",
-        label: "Người dùng",
-        description: "Cộng đồng đang sử dụng",
-    },
-    {
-        icon: FileText,
-        value: "500+",
-        label: "Truy nã",
-        description: "Đối tượng trong danh sách",
-    },
+    { value: 'Real‑time', label: 'Dashboard thống kê' },
+    { value: 'Bản đồ', label: 'Heatmap & marker tội phạm' },
+    { value: 'Truy nã', label: 'Đồng bộ dữ liệu thật' },
+    { value: 'Weather', label: 'Cảnh báo thiên tai' },
 ];
 
-export function Stats() {
+export const StatsSection: React.FC = () => {
     return (
-        <section id="stats" className="border-y bg-amber-50/50 dark:bg-amber-950/20 py-12">
-            <div className="container mx-auto">
-                <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    {stats.map((stat, i) => {
-                        const Icon = stat.icon;
-                        return (
-                            <Card key={i} className="border-0 bg-background/80 backdrop-blur-sm shadow-sm">
-                                <CardContent className="flex flex-col items-center space-y-2 p-6 text-center">
-                                    <div className="rounded-full bg-amber-100 dark:bg-amber-950/50 p-3">
-                                        <Icon className="h-6 w-6 text-amber-600 dark:text-amber-500" />
-                                    </div>
-                                    <div className="text-3xl font-bold text-amber-600 dark:text-amber-500">{stat.value}</div>
-                                    <div className="text-sm font-semibold text-muted-foreground">{stat.label}</div>
-                                    <div className="text-xs text-muted-foreground">{stat.description}</div>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
-                </div>
+        <section className="py-16 relative z-10">
+            <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+                {stats.map((stat) => (
+                    <Card
+                        key={stat.label}
+                        className="bg-white border-slate-200 text-center shadow-sm"
+                    >
+                        <CardHeader className="space-y-1 pb-2">
+                            <CardTitle className="text-[18px] sm:text-3xl md:text-4xl text-slate-900">
+                                {stat.value}
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-[12px] sm:text-sm text-slate-500 font-medium uppercase tracking-widest">
+                            {stat.label}
+                        </CardContent>
+                    </Card>
+                ))}
             </div>
         </section>
     );
-}
+};
+
 
