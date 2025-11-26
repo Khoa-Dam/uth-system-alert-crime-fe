@@ -6,6 +6,8 @@
 export const publicRoutes = [
     "/", // Trang chủ - public, không cần auth
     "/landing-page", // Trang giới thiệu hệ thống
+    "/weather",
+    "/wanted",
     "/terms",
     "/privacy",
     "/about",
@@ -20,6 +22,8 @@ export const authRoutes = [
     "/signup",
     "/reset-password",
     "/forgot-password",
+    "/map",
+    "/reports",
 ] as const;
 
 /**

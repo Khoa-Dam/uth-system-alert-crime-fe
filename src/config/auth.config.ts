@@ -73,9 +73,6 @@ export const authConfig = {
                         ? `${env.API_BASE_URL}/auth/login`
                         : `${env.API_BASE_URL}/api/auth/login`
 
-                    console.log('[Auth] Calling API:', apiUrl)
-                    console.log('[Auth] Email:', credentials.email)
-
                     const response = await fetch(apiUrl, {
                         method: 'POST',
                         headers: {
@@ -87,7 +84,6 @@ export const authConfig = {
                         }),
                     })
 
-                    console.log('[Auth] Response status:', response.status, response.statusText)
 
                     if (!response.ok) {
                         const errorText = await response.text()
@@ -100,11 +96,6 @@ export const authConfig = {
                     }
 
                     const data = await response.json()
-                    console.log('[Auth] Response data:', {
-                        hasAccessToken: !!data.accessToken,
-                        hasUser: !!data.user,
-                        userId: data.user?.id || data.userId
-                    })
 
                     if (data.accessToken) {
                         return {
