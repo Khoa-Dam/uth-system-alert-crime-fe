@@ -37,7 +37,8 @@ export function useTriggerWantedCriminalsScraper() {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (pages?: number) => scraperService.triggerWantedCriminalsScraper(pages),
+        mutationFn: ({ pages, limit }: { pages?: number; limit?: number }) =>
+            scraperService.triggerWantedCriminalsScraper(pages, limit),
         onSuccess: () => {
             // Invalidate scraper status to refresh
             queryClient.invalidateQueries({ queryKey: scraperKeys.status() });

@@ -20,10 +20,14 @@ export default function AdminScraperPage() {
     const triggerWeatherNewsMutation = useTriggerWeatherNewsScraper();
 
     const [wantedCriminalsPages, setWantedCriminalsPages] = useState(5);
+    const [wantedCriminalsLimit, setWantedCriminalsLimit] = useState<number | undefined>(undefined);
 
     const handleTriggerWantedCriminals = async () => {
         try {
-            const result = await triggerWantedCriminalsMutation.mutateAsync(wantedCriminalsPages);
+            const result = await triggerWantedCriminalsMutation.mutateAsync({ 
+                pages: wantedCriminalsPages,
+                limit: wantedCriminalsLimit
+            });
             toast.success(result.message || `Đã scrape ${result.count} đối tượng truy nã`);
         } catch (err: any) {
             toast.error(err?.message || 'Không thể kích hoạt scraper');
@@ -73,19 +77,40 @@ export default function AdminScraperPage() {
                             <CardTitle className="text-sm">Cấu hình</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <div className="space-y-2">
-                                <Label htmlFor="pages">Số trang scrape</Label>
-                                <Input
-                                    id="pages"
-                                    type="number"
-                                    min={1}
-                                    max={50}
-                                    value={wantedCriminalsPages}
-                                    onChange={(e) => setWantedCriminalsPages(Number(e.target.value))}
-                                />
-                                <p className="text-xs text-muted-foreground">
-                                    Mỗi trang chứa khoảng 30 đối tượng
-                                </p>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="pages">Số trang scrape (Mặc định: 5)</Label>
+                                    <Input
+                                        id="pages"
+                                        type="number"
+                                        min={1}
+                                        max={50}
+                                        value={wantedCriminalsPages}
+                                        onChange={(e) => setWantedCriminalsPages(Number(e.target.value))}
+                                        disabled={!!wantedCriminalsLimit}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Mỗi trang chứa khoảng 30 đối tượng
+                                    </p>
+                                </div>
+                                
+                                <div className="space-y-2">
+                                    <Label htmlFor="limit">Giới hạn số lượng (Tùy chọn)</Label>
+                                    <Input
+                                        id="limit"
+                                        type="number"
+                                        min={1}
+                                        placeholder="Nhập số lượng giới hạn (VD: 100)"
+                                        value={wantedCriminalsLimit || ''}
+                                        onChange={(e) => {
+                                            const val = e.target.value ? Number(e.target.value) : undefined;
+                                            setWantedCriminalsLimit(val);
+                                        }}
+                                    />
+                                    <p className="text-xs text-muted-foreground">
+                                        Nếu nhập giới hạn, số trang sẽ bị bỏ qua
+                                    </p>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>

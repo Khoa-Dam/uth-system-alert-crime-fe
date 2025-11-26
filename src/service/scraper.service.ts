@@ -37,13 +37,19 @@ export interface ScraperStatus {
 class ScraperService {
     /**
      * Trigger wanted criminals scraper (Admin only)
+     * @param pages Number of pages to scrape (default 5)
+     * @param limit Max number of items to scrape (overrides pages)
      */
-    async triggerWantedCriminalsScraper(pages?: number): Promise<WantedCriminalsScraperResponse> {
+    async triggerWantedCriminalsScraper(pages?: number, limit?: number): Promise<WantedCriminalsScraperResponse> {
         try {
+            const params: any = {};
+            if (pages) params.pages = pages;
+            if (limit) params.limit = limit;
+
             const response = await apiClient.post<WantedCriminalsScraperResponse>(
                 `${SCRAPER_BASE}/wanted-criminals`,
                 null,
-                { params: { pages } }
+                { params }
             );
             return response.data;
         } catch (error) {
