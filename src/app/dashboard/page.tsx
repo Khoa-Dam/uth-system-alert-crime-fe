@@ -3,6 +3,7 @@
 import { useMemo } from 'react';
 import Link from 'next/link';
 import type { LucideIcon } from 'lucide-react';
+import dynamic from 'next/dynamic';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,30 +12,29 @@ import { Spinner } from '@/components/ui/spinner';
 import {
     Users,
     FileWarning,
-    MapPin,
     AlertTriangle,
     Shield,
     Eye,
     Bell,
     Globe,
     ShieldCheck,
+    MapPin,
 } from 'lucide-react';
-import {
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-} from 'recharts';
 
 import { HomeWantedCriminal } from '@/service/home.service';
 import { useHomeData } from '@/hooks/use-home-data';
 import { useStatistics, useHeatmap } from '@/hooks/use-statistics';
 
+// Lazy load charts
+const CrimeTypePieChart = dynamic(() => import('./components/CrimeTypePieChart'), {
+    ssr: false,
+    loading: () => <div className="flex h-full items-center justify-center"><Spinner className="h-6 w-6 text-muted-foreground" /></div>
+});
+
+const DistrictBarChart = dynamic(() => import('./components/DistrictBarChart'), {
+    ssr: false,
+    loading: () => <div className="flex h-full items-center justify-center"><Spinner className="h-6 w-6 text-muted-foreground" /></div>
+});
 
 const systemNotices = [
     {
@@ -43,12 +43,6 @@ const systemNotices = [
         content: '',
         type: 'info',
     },
-    // {
-    //     id: 2,
-    //     title: 'Cảnh báo an ninh',
-    //     content: 'Phát hiện hoạt động đáng ngờ tại khu vực biên giới phía Bắc',
-    //     type: 'warning',
-    // },
 ];
 
 const fallbackWantedCriminals: HomeWantedCriminal[] = [
@@ -268,32 +262,7 @@ export default function DashboardPage() {
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground mb-2">Theo loại tội phạm</p>
                                 <div className="h-64">
-                                    {crimeTypeData.length ? (
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <PieChart>
-                                                <Pie
-                                                    data={crimeTypeData}
-                                                    dataKey="count"
-                                                    nameKey="label"
-                                                    innerRadius={50}
-                                                    outerRadius={90}
-                                                    paddingAngle={1}
-                                                >
-                                                    {crimeTypeData.map((entry, index) => (
-                                                        <Cell key={`cell-${entry.label}`} fill={typeColors[index % typeColors.length]} />
-                                                    ))}
-                                                </Pie>
-                                                <Tooltip
-                                                    formatter={(value) => `${Number(value).toLocaleString('vi-VN')} báo cáo`}
-                                                    wrapperClassName="text-sm"
-                                                />
-                                            </PieChart>
-                                        </ResponsiveContainer>
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                                            Chưa có dữ liệu
-                                        </div>
-                                    )}
+                                    <CrimeTypePieChart data={crimeTypeData} colors={typeColors} />
                                 </div>
                                 {crimeTypeData.length ? (
                                     <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
@@ -312,28 +281,7 @@ export default function DashboardPage() {
                             <div>
                                 <p className="text-sm font-medium text-muted-foreground mb-2">Top quận/huyện</p>
                                 <div className="h-64">
-                                    {topDistricts.length ? (
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <BarChart data={topDistricts}>
-                                                <XAxis
-                                                    dataKey="district"
-                                                    tick={{ fontSize: 12 }}
-                                                    tickLine={false}
-                                                    axisLine={false}
-                                                />
-                                                <YAxis tickLine={false} axisLine={false} />
-                                                <Tooltip
-                                                    formatter={(value) => `${Number(value).toLocaleString('vi-VN')} báo cáo`}
-                                                    wrapperClassName="text-sm"
-                                                />
-                                                <Bar dataKey="count" fill="#2563eb" radius={[4, 4, 0, 0]} />
-                                            </BarChart>
-                                        </ResponsiveContainer>
-                                    ) : (
-                                        <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
-                                            Chưa có dữ liệu
-                                        </div>
-                                    )}
+                                    <DistrictBarChart data={topDistricts} />
                                 </div>
                             </div>
                         </CardContent>

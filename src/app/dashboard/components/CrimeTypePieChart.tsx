@@ -1,0 +1,49 @@
+'use client';
+
+import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
+
+interface CrimeTypeData {
+    label: string;
+    count: number;
+    [key: string]: any;
+}
+
+interface CrimeTypePieChartProps {
+    data: CrimeTypeData[];
+    colors: string[];
+}
+
+const CrimeTypePieChart = ({ data, colors }: CrimeTypePieChartProps) => {
+    if (!data.length) {
+        return (
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                Chưa có dữ liệu
+            </div>
+        );
+    }
+
+    return (
+        <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+                <Pie
+                    data={data}
+                    dataKey="count"
+                    nameKey="label"
+                    innerRadius={50}
+                    outerRadius={90}
+                    paddingAngle={1}
+                >
+                    {data.map((entry, index) => (
+                        <Cell key={`cell-${entry.label}`} fill={colors[index % colors.length]} />
+                    ))}
+                </Pie>
+                <Tooltip
+                    formatter={(value) => `${Number(value).toLocaleString('vi-VN')} báo cáo`}
+                    wrapperClassName="text-sm"
+                />
+            </PieChart>
+        </ResponsiveContainer>
+    );
+};
+
+export default CrimeTypePieChart;
