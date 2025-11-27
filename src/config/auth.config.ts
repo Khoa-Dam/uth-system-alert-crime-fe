@@ -12,7 +12,7 @@ export const authConfig = {
             const isLoggedIn = !!auth?.user
             const pathname = nextUrl.pathname
 
-            // Public routes - always allowed
+            // Public routes - always allowed ok
             if (isPublicRoute(pathname)) {
                 return true
             }
