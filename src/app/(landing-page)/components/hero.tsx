@@ -46,7 +46,7 @@ const CustomTechEarth = () => {
                         width: '100%',
                         height: '100%',
                         backgroundImage:
-                            "url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/World_map_blank_without_borders.svg/2000px-World_map_blank_without_borders.svg.png')",
+                            "url('/world-map.png')",
                         backgroundSize: `${MAP_CIRCUMFERENCE}px 100%`,
                         backgroundRepeat: 'repeat-x',
                         backgroundPosition: `${-bgPosition}px center`,
@@ -104,7 +104,7 @@ export const HeroSection: React.FC<HeroProps> = ({ appUrl }) => {
                     </div>
                 </div>
 
-                <div id="demo" className="relative h-[400px] lg:h-[600px] w-full flex items-center justify-center perspective-1000">
+                <div id="demo" className="relative hidden sm:block h-[400px] lg:h-[600px] w-full flex items-center justify-center perspective-1000">
                     <CustomTechEarth />
                 </div>
             </div>
