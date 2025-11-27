@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Users, ShieldX, FileText, Database } from 'lucide-react';
+import { Users, ShieldX, FileText, Database, CloudSun } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 
@@ -33,6 +33,13 @@ const adminSections = [
         href: '/admin/scraper',
         icon: Database,
         color: 'text-purple-500',
+    },
+    {
+        title: 'Tin tức thời tiết',
+        description: 'Quản lý tin tức và cảnh báo',
+        href: '/admin/weather',
+        icon: CloudSun,
+        color: 'text-orange-500',
     },
 ];
 

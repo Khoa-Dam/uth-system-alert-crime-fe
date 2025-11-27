@@ -21,6 +21,32 @@ export interface WeatherNewsResponse {
     updatedAt: Date;
 }
 
+export interface CreateWeatherNewsDto {
+    type: WeatherNewsType;
+    title: string;
+    summary?: string;
+    content?: string;
+    imageUrl?: string;
+    sourceUrl?: string;
+    publishedDate?: Date;
+    nextUpdateAt?: Date;
+    location?: string;
+    severity?: string;
+}
+
+export interface UpdateWeatherNewsDto {
+    type?: WeatherNewsType;
+    title?: string;
+    summary?: string;
+    content?: string;
+    imageUrl?: string;
+    sourceUrl?: string;
+    publishedDate?: Date;
+    nextUpdateAt?: Date;
+    location?: string;
+    severity?: string;
+}
+
 class WeatherNewsService {
     private readonly basePath = '/weather-news';
 
@@ -33,6 +59,20 @@ class WeatherNewsService {
     async findOne(id: string): Promise<WeatherNewsResponse> {
         const { data } = await apiClient.get<WeatherNewsResponse>(`${this.basePath}/${id}`);
         return data;
+    }
+
+    async create(payload: CreateWeatherNewsDto): Promise<WeatherNewsResponse> {
+        const { data } = await apiClient.post<WeatherNewsResponse>(this.basePath, payload);
+        return data;
+    }
+
+    async update(id: string, payload: UpdateWeatherNewsDto): Promise<WeatherNewsResponse> {
+        const { data } = await apiClient.put<WeatherNewsResponse>(`${this.basePath}/${id}`, payload);
+        return data;
+    }
+
+    async remove(id: string): Promise<void> {
+        await apiClient.delete(`${this.basePath}/${id}`);
     }
 }
 

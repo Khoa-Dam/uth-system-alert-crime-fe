@@ -108,7 +108,7 @@ export function AppHeader() {
                         <Button
                             variant="ghost"
                             size="sm"
-                            className="text-sm hidden sm:inline-flex"
+                            className="text-sm"
                             onClick={() => router.push('/login')}
                             disabled={isLoading}
                         >
@@ -116,7 +116,7 @@ export function AppHeader() {
                         </Button>
                         <Button
                             size="sm"
-                            className="text-sm bg-red-600 hover:bg-red-700 text-white"
+                            className="text-sm  hidden sm:inline-flex bg-red-600 hover:bg-red-700 text-white"
                             onClick={() => router.push('/signup')}
                             disabled={isLoading}
                         >

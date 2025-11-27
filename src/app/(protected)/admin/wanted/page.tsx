@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import wantedCriminalService, {
     WantedCriminalResponse,
@@ -15,8 +15,9 @@ import {
     useDeleteWantedCriminal,
     wantedCriminalsKeys,
 } from '@/hooks/use-wanted-criminals-admin';
+import { useWantedCriminals } from '@/hooks/use-wanted-criminals';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import {
     Table,
     TableBody,
@@ -48,10 +49,28 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 export default function AdminWantedPage() {
-    const { data: criminals = [], isLoading, error } = useQuery({
-        queryKey: wantedCriminalsKeys.lists(),
-        queryFn: () => wantedCriminalService.findAll(),
+    const [page, setPage] = useState(1);
+    const [search, setSearch] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+
+    // Debounce search input
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearch(e.target.value);
+        const timeoutId = setTimeout(() => {
+            setDebouncedSearch(e.target.value);
+            setPage(1); // Reset to page 1 on search
+        }, 500);
+        return () => clearTimeout(timeoutId);
+    };
+
+    const { data: paginatedData, isLoading, error } = useWantedCriminals({
+        page,
+        limit: 10,
+        search: debouncedSearch,
     });
+
+    const criminals = paginatedData?.data || [];
+    const totalPages = paginatedData?.totalPages || 1;
 
     const createMutation = useCreateWantedCriminal();
     const updateMutation = useUpdateWantedCriminal();
@@ -166,14 +185,17 @@ export default function AdminWantedPage() {
 
     return (
         <div className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
                     <h1 className="text-3xl font-bold">Quản lý đối tượng truy nã</h1>
                     <p className="text-muted-foreground">
                         Thêm, sửa, xóa thông tin đối tượng truy nã
                     </p>
                 </div>
-                <Button onClick={() => setCreateDialogOpen(true)}>
+                <Button onClick={() => {
+                    resetForm();
+                    setCreateDialogOpen(true);
+                }}>
                     <Plus className="w-4 h-4 mr-2" />
                     Thêm đối tượng
                 </Button>
@@ -181,8 +203,21 @@ export default function AdminWantedPage() {
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Danh sách đối tượng truy nã</CardTitle>
-                    <CardDescription>Tổng số: {criminals.length} đối tượng</CardDescription>
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <div>
+                            <CardTitle>Danh sách đối tượng truy nã</CardTitle>
+                            <CardDescription>Tổng số: {paginatedData?.total || 0} đối tượng</CardDescription>
+                        </div>
+                        <div className="relative w-full sm:w-64">
+                            <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                            <Input
+                                placeholder="Tìm kiếm theo tên, tội danh..."
+                                className="pl-8"
+                                value={search}
+                                onChange={handleSearchChange}
+                            />
+                        </div>
+                    </div>
                 </CardHeader>
                 <CardContent>
                     {isLoading ? (
@@ -190,55 +225,88 @@ export default function AdminWantedPage() {
                             <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Họ tên</TableHead>
-                                    <TableHead>Năm sinh</TableHead>
-                                    <TableHead>Tội danh</TableHead>
-                                    <TableHead>Nơi ĐKTT</TableHead>
-                                    <TableHead>Số QĐ</TableHead>
-                                    <TableHead className="text-right">Hành động</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {criminals.map((criminal) => (
-                                    <TableRow key={criminal.id}>
-                                        <TableCell className="font-medium">
-                                            {criminal.name}
-                                        </TableCell>
-                                        <TableCell>{criminal.birthYear}</TableCell>
-                                        <TableCell className="max-w-xs truncate">
-                                            {criminal.crime}
-                                        </TableCell>
-                                        <TableCell className="max-w-xs truncate">
-                                            {criminal.address || 'N/A'}
-                                        </TableCell>
-                                        <TableCell>{criminal.decisionNumber || 'N/A'}</TableCell>
-                                        <TableCell className="text-right">
-                                            <div className="flex justify-end gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    onClick={() => openEditDialog(criminal)}
-                                                >
-                                                    <Pencil className="w-4 h-4" />
-                                                </Button>
-                                                <Button
-                                                    variant="destructive"
-                                                    size="sm"
-                                                    onClick={() => openDeleteDialog(criminal)}
-                                                >
-                                                    <Trash2 className="w-4 h-4" />
-                                                </Button>
-                                            </div>
-                                        </TableCell>
+                        <>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>Họ tên</TableHead>
+                                        <TableHead>Năm sinh</TableHead>
+                                        <TableHead>Tội danh</TableHead>
+                                        <TableHead>Nơi ĐKTT</TableHead>
+                                        <TableHead>Số QĐ</TableHead>
+                                        <TableHead className="text-right">Hành động</TableHead>
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {criminals.length > 0 ? (
+                                        criminals.map((criminal) => (
+                                            <TableRow key={criminal.id}>
+                                                <TableCell className="font-medium">
+                                                    {criminal.name}
+                                                </TableCell>
+                                                <TableCell>{criminal.birthYear}</TableCell>
+                                                <TableCell className="max-w-xs truncate">
+                                                    {criminal.crime}
+                                                </TableCell>
+                                                <TableCell className="max-w-xs truncate">
+                                                    {criminal.address || 'N/A'}
+                                                </TableCell>
+                                                <TableCell>{criminal.decisionNumber || 'N/A'}</TableCell>
+                                                <TableCell className="text-right">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            variant="outline"
+                                                            size="sm"
+                                                            onClick={() => openEditDialog(criminal)}
+                                                        >
+                                                            <Pencil className="w-4 h-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="destructive"
+                                                            size="sm"
+                                                            onClick={() => openDeleteDialog(criminal)}
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </Button>
+                                                    </div>
+                                                </TableCell>
+                                            </TableRow>
+                                        ))
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                                                Không tìm thấy dữ liệu
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </>
                     )}
                 </CardContent>
+                {totalPages > 1 && (
+                    <CardFooter className="flex items-center justify-center space-x-2 py-4">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((p) => Math.max(1, p - 1))}
+                            disabled={page === 1 || isLoading}
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm font-medium">
+                            Trang {page} / {totalPages}
+                        </span>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                            disabled={page === totalPages || isLoading}
+                        >
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </CardFooter>
+                )}
             </Card>
 
             {/* Create Dialog */}

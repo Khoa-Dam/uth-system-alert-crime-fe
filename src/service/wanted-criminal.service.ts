@@ -36,14 +36,27 @@ export interface WantedCriminalResponse {
     createdAt: Date;
 }
 
+export interface PaginatedResponse<T> {
+    data: T[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+}
+
 class WantedCriminalService {
     /**
      * Get all wanted criminals
      * Public endpoint, no authentication required
      */
-    async findAll(): Promise<WantedCriminalResponse[]> {
+    async findAll(page = 1, limit = 9, search?: string, name?: string, crime?: string): Promise<PaginatedResponse<WantedCriminalResponse>> {
         try {
-            const { data } = await apiClient.get<WantedCriminalResponse[]>(WANTED_CRIMINAL_BASE);
+            const params: any = { page, limit };
+            if (search) params.search = search;
+            if (name) params.name = name;
+            if (crime) params.crime = crime;
+
+            const { data } = await apiClient.get<PaginatedResponse<WantedCriminalResponse>>(WANTED_CRIMINAL_BASE, { params });
             return data;
         } catch (error: any) {
             const errorData = error?.response?.data;

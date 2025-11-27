@@ -1,35 +1,25 @@
-'use client';
-
 import { useQuery } from '@tanstack/react-query';
-import weatherNewsService, { WeatherNewsResponse, WeatherNewsType } from '@/service/weather-news.service';
+import weatherNewsService, { WeatherNewsType } from '@/service/weather-news.service';
 
-const weatherNewsKeys = {
-    all: ['weatherNews'] as const,
-    list: (type?: WeatherNewsType) => [...weatherNewsKeys.all, type ?? 'all'] as const,
-    detail: (id: string) => [...weatherNewsKeys.all, 'detail', id] as const,
+export const weatherNewsKeys = {
+    all: ['weather-news'] as const,
+    lists: () => [...weatherNewsKeys.all, 'list'] as const,
+    list: (type?: WeatherNewsType) => [...weatherNewsKeys.lists(), { type }] as const,
+    details: () => [...weatherNewsKeys.all, 'detail'] as const,
+    detail: (id: string) => [...weatherNewsKeys.details(), id] as const,
 };
 
 export function useWeatherNews(type?: WeatherNewsType) {
-    return useQuery<WeatherNewsResponse[]>({
+    return useQuery({
         queryKey: weatherNewsKeys.list(type),
         queryFn: () => weatherNewsService.findAll(type),
-        staleTime: 1000 * 60 * 5,
     });
 }
 
-export function useWeatherNewsDetail(id?: string) {
-    return useQuery<WeatherNewsResponse>({
-        queryKey: id ? weatherNewsKeys.detail(id) : weatherNewsKeys.detail('unknown'),
-        queryFn: () => {
-            if (!id) {
-                return Promise.reject(new Error('Missing weather news id'));
-            }
-            return weatherNewsService.findOne(id);
-        },
-        enabled: Boolean(id),
-        staleTime: 1000 * 60 * 5,
+export function useWeatherNewsDetail(id: string) {
+    return useQuery({
+        queryKey: weatherNewsKeys.detail(id),
+        queryFn: () => weatherNewsService.findOne(id),
+        enabled: !!id,
     });
 }
-
-export type { WeatherNewsResponse, WeatherNewsType } from '@/service/weather-news.service';
-

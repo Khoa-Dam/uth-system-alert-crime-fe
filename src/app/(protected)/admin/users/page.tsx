@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Plus, Pencil, Trash2, Loader2, ArrowLeft } from 'lucide-react';
 import { useUsersQuery, useCreateUser, useUpdateUser, useDeleteUser } from '@/hooks/use-users';
 import { User, CreateUserDto, UpdateUserDto, Role } from '@/service/user.service';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,7 @@ const roleColors: Record<Role, string> = {
 };
 
 export default function AdminUsersPage() {
+    const router = useRouter();
     const { data: users = [], isLoading, error } = useUsersQuery();
     const createUserMutation = useCreateUser();
     const updateUserMutation = useUpdateUser();
@@ -153,9 +155,14 @@ export default function AdminUsersPage() {
     return (
         <div className="p-6 space-y-6">
             <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold">Quản lý người dùng</h1>
-                    <p className="text-muted-foreground">Quản lý tài khoản người dùng trong hệ thống</p>
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" onClick={() => router.back()}>
+                        <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                    <div>
+                        <h1 className="text-3xl font-bold">Quản lý người dùng</h1>
+                        <p className="text-muted-foreground">Quản lý tài khoản người dùng trong hệ thống</p>
+                    </div>
                 </div>
                 <Button onClick={() => setCreateDialogOpen(true)}>
                     <Plus className="w-4 h-4 mr-2" />

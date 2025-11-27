@@ -39,9 +39,24 @@ export function useTriggerWantedCriminalsScraper() {
     return useMutation({
         mutationFn: ({ pages, limit }: { pages?: number; limit?: number }) =>
             scraperService.triggerWantedCriminalsScraper(pages, limit),
-        onSuccess: () => {
-            // Invalidate scraper status to refresh
-            queryClient.invalidateQueries({ queryKey: scraperKeys.status() });
+        onSuccess: (data) => {
+            // Manually update scraper status in cache to reflect immediate results
+            queryClient.setQueryData(scraperKeys.status(), (oldData: ScraperStatus | undefined) => {
+                const currentData = oldData || { wantedCriminals: {}, weatherNews: {} };
+                return {
+                    ...currentData,
+                    wantedCriminals: {
+                        ...currentData.wantedCriminals,
+                        lastRun: new Date().toISOString(),
+                        status: 'Success',
+                        count: data.count,
+                    },
+                };
+            });
+            
+            // Do NOT invalidate scraper status immediately, as backend might not track manual runs
+            // queryClient.invalidateQueries({ queryKey: scraperKeys.status() });
+            
             // Invalidate wanted criminals list if it exists
             queryClient.invalidateQueries({ queryKey: ['wanted-criminals'] });
         },
@@ -56,9 +71,23 @@ export function useTriggerWeatherNewsScraper() {
 
     return useMutation({
         mutationFn: () => scraperService.triggerWeatherNewsScraper(),
-        onSuccess: () => {
-            // Invalidate scraper status to refresh
-            queryClient.invalidateQueries({ queryKey: scraperKeys.status() });
+        onSuccess: (data) => {
+            // Manually update scraper status in cache
+            queryClient.setQueryData(scraperKeys.status(), (oldData: ScraperStatus | undefined) => {
+                const currentData = oldData || { wantedCriminals: {}, weatherNews: {} };
+                return {
+                    ...currentData,
+                    weatherNews: {
+                        ...currentData.weatherNews,
+                        lastRun: new Date().toISOString(),
+                        status: 'Success',
+                        count: data.count, // Assuming weather news response also has count
+                    },
+                };
+            });
+
+            // Do NOT invalidate scraper status immediately
+            // queryClient.invalidateQueries({ queryKey: scraperKeys.status() });
             queryClient.invalidateQueries({ queryKey: scraperKeys.weatherStatus() });
             // Invalidate weather news list if it exists
             queryClient.invalidateQueries({ queryKey: ['weather-news'] });

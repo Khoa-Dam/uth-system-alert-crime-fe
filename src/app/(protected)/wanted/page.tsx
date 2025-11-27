@@ -1,13 +1,13 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
-import { Search, RefreshCw, MapPin, Users } from 'lucide-react';
+import { Search, RefreshCw, MapPin, Users, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useWantedCriminals } from '@/hooks/use-wanted-criminals';
 import type { WantedCriminalResponse } from '@/service/wanted-criminal.service';
 
@@ -20,72 +20,29 @@ const formatDate = (value?: string | Date) => {
 const ITEMS_PER_PAGE = 9;
 
 export default function WantedPage() {
-    const { data, isLoading, error, refetch, isFetching } = useWantedCriminals();
+    const [page, setPage] = useState(1);
     const [search, setSearch] = useState('');
-    const [crimeFilter, setCrimeFilter] = useState('');
-    const [loadMoreCount, setLoadMoreCount] = useState(0);
-    const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
-    const crimes = useMemo(() => {
-        const unique = new Set<string>();
-        data?.forEach((item) => unique.add(item.crime));
-        return Array.from(unique);
-    }, [data]);
-
-    const filteredList = useMemo(() => {
-        if (!data) return [];
-        return data.filter((item) => {
-            const query = search.toLowerCase();
-            const matchesQuery =
-                !query ||
-                item.name.toLowerCase().includes(query) ||
-                item.crime.toLowerCase().includes(query) ||
-                item.address?.toLowerCase().includes(query) ||
-                item.decisionNumber?.toLowerCase().includes(query);
-            const matchesCrime = !crimeFilter || item.crime === crimeFilter;
-            return matchesQuery && matchesCrime;
-        });
-    }, [data, search, crimeFilter]);
-
-    // Reset loadMoreCount when filters change - handled in onChange handlers
+    // Debounce search input
     const handleSearchChange = (value: string) => {
         setSearch(value);
-        if (loadMoreCount > 0) {
-            setLoadMoreCount(0);
-        }
+        const timeoutId = setTimeout(() => {
+            setDebouncedSearch(value);
+            setPage(1); // Reset to page 1 on search
+        }, 500);
+        return () => clearTimeout(timeoutId);
     };
 
-    const handleCrimeFilterChange = (value: string) => {
-        setCrimeFilter(value);
-        if (loadMoreCount > 0) {
-            setLoadMoreCount(0);
-        }
-    };
+    const { data: paginatedData, isLoading, error, refetch, isFetching } = useWantedCriminals({
+        page,
+        limit: ITEMS_PER_PAGE,
+        search: debouncedSearch,
+    });
 
-    const visibleCount = ITEMS_PER_PAGE + loadMoreCount * ITEMS_PER_PAGE;
-    const displayedList = useMemo(() => filteredList.slice(0, visibleCount), [filteredList, visibleCount]);
-    const hasMore = filteredList.length > visibleCount;
-
-    const handleLoadMore = useCallback(() => {
-        setLoadMoreCount((prev) => prev + 1);
-    }, []);
-
-    // Infinite scroll: tự động load thêm khi sentinel vào viewport
-    useEffect(() => {
-        if (!hasMore || isLoading || isFetching) return;
-        const el = loadMoreRef.current;
-        if (!el) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            const [entry] = entries;
-            if (entry.isIntersecting) {
-                handleLoadMore();
-            }
-        }, { root: null, rootMargin: '0px', threshold: 1.0 });
-
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [hasMore, isLoading, isFetching, handleLoadMore]);
+    const criminals = paginatedData?.data || [];
+    const totalPages = paginatedData?.totalPages || 1;
+    const totalItems = paginatedData?.total || 0;
 
     const renderCriminalCard = (criminal: WantedCriminalResponse) => {
         return (
@@ -120,11 +77,10 @@ export default function WantedPage() {
     };
 
     return (
-        <div className="space-y-6 container mx-auto px-4 sm:px-6 lg:px-8 py-6"> {/* Thêm padding container */}
+        <div className="space-y-6 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h1 className="text-2xl font-semibold tracking-tight">Danh sách truy nã</h1>
-
                 </div>
                 <div className="flex gap-3">
                     <Button
@@ -140,8 +96,8 @@ export default function WantedPage() {
             </div>
 
             <Card className="border border-border/70 shadow-sm">
-                <CardContent className="space-y-4">
-                    <div className="grid gap-4 md:grid-cols-2">
+                <CardContent className="space-y-4 pt-6">
+                    <div className="grid gap-4 md:grid-cols-1">
                         <div className="relative">
                             <Search className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                             <Input
@@ -151,30 +107,11 @@ export default function WantedPage() {
                                 onChange={(e) => handleSearchChange(e.target.value)}
                             />
                         </div>
-                        <div className="flex gap-2">
-                            <select
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                                value={crimeFilter}
-                                onChange={(e) => handleCrimeFilterChange(e.target.value)}
-                            >
-                                <option value="">Tất cả tội danh</option>
-                                {crimes.map((crime) => (
-                                    <option key={crime} value={crime}>
-                                        {crime}
-                                    </option>
-                                ))}
-                            </select>
-                            {crimeFilter && (
-                                <Button variant="ghost" onClick={() => handleCrimeFilterChange('')}>
-                                    Xóa
-                                </Button>
-                            )}
-                        </div>
                     </div>
                     <div className="text-sm text-muted-foreground">
                         Tổng cộng:{' '}
                         <span className="font-medium text-foreground">
-                            {filteredList.length.toLocaleString('vi-VN')} đối tượng
+                            {totalItems.toLocaleString('vi-VN')} đối tượng
                         </span>
                     </div>
                 </CardContent>
@@ -191,14 +128,34 @@ export default function WantedPage() {
                 <div className="flex items-center justify-center py-10">
                     <Spinner className="h-6 w-6" />
                 </div>
-            ) : filteredList.length ? (
-                <div className="space-y-4">
-                    <div className=" flex flex-col gap-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                        {displayedList.map(renderCriminalCard)}
+            ) : criminals.length > 0 ? (
+                <div className="space-y-6">
+                    <div className="flex flex-col gap-4 sm:grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                        {criminals.map(renderCriminalCard)}
                     </div>
-                    {hasMore && (
-                        <div ref={loadMoreRef} className="flex justify-center py-4">
-                            <Spinner className="h-5 w-5" />
+                    
+                    {/* Pagination Controls */}
+                    {totalPages > 1 && (
+                        <div className="flex items-center justify-center gap-2 py-4">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                disabled={page === 1 || isFetching}
+                            >
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                            <span className="text-sm font-medium">
+                                Trang {page} / {totalPages}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                disabled={page === totalPages || isFetching}
+                            >
+                                <ChevronRight className="h-4 w-4" />
+                            </Button>
                         </div>
                     )}
                 </div>
