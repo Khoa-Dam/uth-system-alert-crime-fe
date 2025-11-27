@@ -1,6 +1,6 @@
 "use client"
 
-import { MapPin, Home, MessageSquareWarning, ShieldX, CloudRain, Phone, FileText, AlertTriangle, ShieldCheck, Users, Globe } from "lucide-react"
+import { MapPin, Home, MessageSquareWarning, ShieldX, CloudRain, Phone, FileText, AlertTriangle, ShieldCheck, Users, Globe, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation"
 import { useStatistics } from "@/hooks/use-statistics"
 import { useHomeData } from "@/hooks/use-home-data"
 import { Spinner } from "@/components/ui/spinner"
+import { useUser } from "@/hooks/use-user"
 
 interface SidebarProps {
     isOpen: boolean
@@ -21,6 +22,7 @@ export default function Sidebar({
     onClose,
 }: SidebarProps) {
     const pathname = usePathname()
+    const { userRole } = useUser()
 
     const { data: stats, isLoading: statsLoading } = useStatistics()
     const { data: homeData, isLoading: homeLoading } = useHomeData()
@@ -32,8 +34,11 @@ export default function Sidebar({
         { label: "Bản Đồ", href: "/map", icon: MapPin },
         { label: "Báo Cáo", href: "/reports", icon: MessageSquareWarning },
         { label: "landing-page", href: "/", icon: Globe },
-
     ]
+
+    if (userRole === 'admin' || userRole === 'Admin') {
+        navItems.push({ label: "Quản trị hệ thống", href: "/admin", icon: Settings })
+    }
 
     const emergencyContacts = [
         { label: "Công an", number: "113" },

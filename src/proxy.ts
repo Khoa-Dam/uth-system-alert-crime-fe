@@ -7,7 +7,6 @@ import {
     isOfficerRoute,
     isApiAuthRoute,
     DEFAULT_LOGIN_REDIRECT,
-    DEFAULT_LOGOUT_REDIRECT,
     UNAUTHORIZED_REDIRECT,
 } from "@/config/routes"
 
@@ -42,7 +41,7 @@ export default auth((req) => {
     // Protected routes - require authentication
     if (!isLoggedIn) {
         // Redirect to login with the original path as a query parameter
-        const loginUrl = new URL(DEFAULT_LOGOUT_REDIRECT, nextUrl)
+        const loginUrl = new URL("/login", nextUrl)
         loginUrl.searchParams.set('redirect', pathname)
         return NextResponse.redirect(loginUrl)
     }

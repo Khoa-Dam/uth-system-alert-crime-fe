@@ -104,7 +104,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 await new Promise(resolve => setTimeout(resolve, 800))
 
                 // Redirect to the original path if exists, otherwise go to home
-                const redirectTo = redirectPath || '/'
+                const redirectTo = redirectPath || '/dashboard'
                 router.push(redirectTo)
                 router.refresh()
             } else {
