@@ -5,7 +5,7 @@ import { BlurFade } from "@/components/blur-fade"
 
 export default function NotFound() {
     return (
-        <div className="container flex min-h-screen flex-col  items-center justify-center px-4 py-10">
+        <div className="container flex min-h-screen flex-col  items-center justify-center bg-white px-4 py-10">
             <div className="flex w-full max-w-4xl flex-col items-center gap-8 lg:flex-row lg:gap-12">
                 {/* Illustration */}
                 <BlurFade delay={0.25} inView >
@@ -16,7 +16,7 @@ export default function NotFound() {
                             alt="404 Not Found"
                             width={400}
                             height={400}
-                            className="drop-shadow-xl dark:bg-white"
+                            className="drop-shadow-xl"
                         />
                     </div>
                 </BlurFade>
