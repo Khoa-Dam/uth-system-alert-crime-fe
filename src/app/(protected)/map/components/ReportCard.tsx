@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import Image from 'next/image';
 import { VerificationCrimeReport, VerificationLevel } from '@/types/map';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -110,41 +112,45 @@ const NativeVideoPlayer: React.FC<{ src: string; className?: string }> = ({ src,
             </button>
 
             {/* Fullscreen Modal */}
-            <AnimatePresence>
-                {isPlaying && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md"
-                        onClick={handleClose}
-                    >
+            {/* Fullscreen Modal */}
+            {typeof document !== 'undefined' && createPortal(
+                <AnimatePresence>
+                    {isPlaying && (
                         <motion.div
-                            initial={{ scale: 0.9, opacity: 0 }}
-                            animate={{ scale: 1, opacity: 1 }}
-                            exit={{ scale: 0.9, opacity: 0 }}
-                            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="relative w-full max-w-4xl mx-4"
-                            onClick={(e) => e.stopPropagation()}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-md"
+                            onClick={handleClose}
                         >
-                            <button
-                                onClick={handleClose}
-                                className="absolute -top-12 right-0 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors"
+                            <motion.div
+                                initial={{ scale: 0.9, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                exit={{ scale: 0.9, opacity: 0 }}
+                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                                className="relative w-full max-w-4xl mx-4"
+                                onClick={(e) => e.stopPropagation()}
                             >
-                                <X className="size-5" />
-                            </button>
-                            <video
-                                ref={videoRef}
-                                src={src}
-                                className="w-full rounded-xl"
-                                controls
-                                autoPlay
-                                playsInline
-                            />
+                                <button
+                                    onClick={handleClose}
+                                    className="absolute -top-12 right-0 rounded-full bg-white/10 p-2 text-white hover:bg-white/20 transition-colors"
+                                >
+                                    <X className="size-5" />
+                                </button>
+                                <video
+                                    ref={videoRef}
+                                    src={src}
+                                    className="w-full rounded-xl"
+                                    controls
+                                    autoPlay
+                                    playsInline
+                                />
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 };
@@ -316,16 +322,21 @@ const ReportCard: React.FC<ReportCardProps> = ({
                                     />
                                 )
                             ) : (
-                                <img
-                                    src={currentMedia}
-                                    alt={`Bằng chứng ${currentMediaIndex + 1}`}
-                                    className="w-full h-auto max-h-72 object-cover rounded-md cursor-zoom-in"
-                                    style={{ aspectRatio: '16 / 9' }}
+                                <div
+                                    className="relative w-full aspect-video max-h-72 rounded-md overflow-hidden cursor-zoom-in bg-muted"
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setIsImageExpanded(true);
                                     }}
-                                />
+                                >
+                                    <Image
+                                        src={currentMedia}
+                                        alt={`Bằng chứng ${currentMediaIndex + 1}`}
+                                        fill
+                                        className="object-cover"
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                    />
+                                </div>
                             )}
 
                             {/* Navigation arrows for multiple media */}
@@ -575,15 +586,15 @@ const ReportCard: React.FC<ReportCardProps> = ({
                 </DialogContent>
             </Dialog>
 
-            {/* Image Preview Overlay */}
-            <AnimatePresence>
-                {isImageExpanded && !isCurrentVideo && (
+            {/* Image Preview Overlay - Portal to body */}
+            {isImageExpanded && !isCurrentVideo && typeof document !== 'undefined' && createPortal(
+                <AnimatePresence>
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-zoom-out"
+                        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm cursor-zoom-out"
                         onClick={(e) => {
                             e.stopPropagation();
                             setIsImageExpanded(false);
@@ -593,17 +604,23 @@ const ReportCard: React.FC<ReportCardProps> = ({
                             initial={{ scale: 0.9 }}
                             animate={{ scale: 1 }}
                             exit={{ scale: 0.9 }}
-                            className="relative max-w-[95vw] max-h-[95vh] p-1 overflow-hidden"
+                            className="relative w-[95vw] h-[90vh] max-w-7xl p-1 overflow-hidden flex items-center justify-center"
                         >
-                            <img
-                                src={currentMedia}
-                                alt="Zoomed preview"
-                                className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-                            />
+                            <div className="relative w-full h-full">
+                                <Image
+                                    src={currentMedia}
+                                    alt="Zoomed preview"
+                                    fill
+                                    className="object-contain rounded-lg shadow-2xl"
+                                    sizes="95vw"
+                                    priority
+                                />
+                            </div>
                         </motion.div>
                     </motion.div>
-                )}
-            </AnimatePresence>
+                </AnimatePresence>,
+                document.body
+            )}
         </div>
     );
 };

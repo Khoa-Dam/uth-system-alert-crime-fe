@@ -1,14 +1,12 @@
 
 'use client';
 
-import { useEffect, useMemo, useRef, useState, Suspense } from 'react'; // 1. Thêm Suspense vào đây
+import { useEffect, useMemo, useRef, useState, Suspense } from 'react'; 
 import { useSearchParams, useRouter } from 'next/navigation';
-import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { useLeaflet } from '@/hooks/use-leaflet';
 import {
     useReportsQuery,
-    reportsKeys,
     useCreateReport,
     useUpdateReport,
     useDeleteReport,
@@ -28,11 +26,8 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Loader2 } from 'lucide-react';
 
-// 2. Đổi tên component chính cũ thành CrimeMapContent
 const CrimeMapContent = () => {
-    // --- GIỮ NGUYÊN TOÀN BỘ LOGIC CŨ CỦA BẠN Ở ĐÂY ---
     const searchParams = useSearchParams();
-    const queryClient = useQueryClient();
     const reportMarkerRef = useRef<any>(null);
     const hasHandledQueryParams = useRef<string>('');
 
