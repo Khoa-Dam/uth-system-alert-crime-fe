@@ -1,36 +1,112 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GuardM - Crime Alert & Safety System
 
-## Getting Started
+🌐 **Live Website:** [https://www.guardm.space/](https://www.guardm.space/)
 
-First, run the development server:
+GuardM is a modern, comprehensive web application designed to enhance community safety through real-time crime reporting, interactive mapping, and safety alerts. Built with the latest web technologies, it provides a seamless experience for users to stay informed and safe.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+![GuardM Preview](/public/og.png)
+
+## 🚀 Features
+
+- **Interactive Crime Map**: Visualize crime reports and safety incidents on a dynamic map using Leaflet.
+- **Real-time Reporting**: Users can submit reports about incidents, suspicious activities, or safety hazards.
+- **Wanted Persons Database**: Searchable database of wanted persons with detailed information.
+- **Weather Integration**: Real-time weather updates and alerts to help users plan safely.
+- **Admin Dashboard**: Comprehensive tools for administrators to manage reports, users, and system data.
+- **PWA Support**: Installable as a Progressive Web App for a native-like experience on mobile and desktop.
+- **Dark/Light Mode**: Fully supported theme switching with system preference detection.
+- **Responsive Design**: Optimized for all devices, from mobile phones to large desktop screens.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 16 (RC)](https://nextjs.org/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) & [Shadcn UI](https://ui.shadcn.com/)
+- **Authentication**: [NextAuth.js v5](https://authjs.dev/)
+- **State Management**: [TanStack Query](https://tanstack.com/query/latest)
+- **Maps**: [Leaflet](https://leafletjs.com/) & [React Leaflet](https://react-leaflet.js.org/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Animations**: [Motion](https://motion.dev/) & [Tailwind Animate](https://github.com/jamiebuilds/tailwindcss-animate)
+
+## 📦 Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- pnpm (recommended), npm, or yarn
+
+### Installation
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/Khoa-Dam/GuardM-fe.git
+    cd GuardM-fe
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    pnpm install
+    ```
+
+3.  **Environment Setup:**
+
+    Create a `.env` file in the root directory and configure the necessary environment variables. You can use `.env.example` as a reference if available.
+
+    ```env
+    # Example variables
+    DATABASE_URL="your_database_url"
+    NEXTAUTH_SECRET="your_nextauth_secret"
+    NEXTAUTH_URL="http://localhost:3000"
+    # Add other API keys (Weather, Maps, etc.)
+    ```
+
+4.  **Run the development server:**
+
+    ```bash
+    pnpm dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## 📂 Project Structure
+
+```
+src/
+├── app/                 # Next.js App Router pages and layouts
+│   ├── (auth)/          # Authentication routes (login, signup)
+│   ├── (landing-page)/  # Public landing page
+│   ├── (protected)/     # Protected routes (dashboard, map, etc.)
+│   └── api/             # API routes
+├── components/          # Reusable UI components
+│   ├── ui/              # Shadcn UI primitives
+│   └── ...              # Feature-specific components
+├── config/              # Site configuration
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility functions and libraries
+├── providers/           # Context providers (Theme, Auth, Query)
+├── service/             # API service layer
+├── styles/              # Global styles
+└── types/               # TypeScript type definitions
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🤝 Contributing
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1.  Fork the project
+2.  Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
 
-## Learn More
+## 📄 License
 
-To learn more about Next.js, take a look at the following resources:
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📞 Contact
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Author**: Kaito (Khoa Dam)
+- **Email**: dmangockhoa0703@gmail.com
+- **GitHub**: [Khoa-Dam](https://github.com/Khoa-Dam)
