@@ -11,7 +11,9 @@ import { SummaryCards } from "./components/SummaryCards";
 import { ReportsHeaderCard } from "./components/ReportsHeaderCard";
 import { RecentReportsSection } from "./components/RecentReportsSection";
 import { MyReportsSection } from "./components/MyReportsSection";
-import { StatisticsSection } from "./components/StatisticsSection";
+import dynamic from 'next/dynamic';
+import { Spinner } from '@/components/ui/spinner';
+const StatisticsSection = dynamic(() => import('./components/StatisticsSection').then(mod => mod.StatisticsSection), { loading: () => <div className="py-20 flex justify-center"><Spinner className="h-8 w-8 text-muted-foreground" /></div>, ssr: false });
 import type { SummaryCardConfig, CrimeTypeDatum } from "./types/types";
 
 export default function ReportsPage() {

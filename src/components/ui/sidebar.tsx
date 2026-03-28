@@ -26,7 +26,7 @@ export function Sidebar({ children }: { children: React.ReactNode }) {
     return (
         <aside
             className={cn(
-                "transition-all duration-300 bg-gray-100 border-r",
+                "transition-[width,padding] duration-300 bg-gray-100 border-r",
                 open ? "w-64" : "w-16"
             )}
         >

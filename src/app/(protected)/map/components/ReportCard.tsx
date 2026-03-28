@@ -393,7 +393,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                                             key={index}
                                             onClick={(e) => { e.stopPropagation(); setCurrentMediaIndex(index); }}
                                             className={cn(
-                                                "w-2 h-2 rounded-full transition-all",
+                                                "w-2 h-2 rounded-full transition-[background-color,transform]",
                                                 index === currentMediaIndex
                                                     ? "bg-white scale-110"
                                                     : "bg-white/50 hover:bg-white/70"
@@ -443,7 +443,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                             </div>
                             <div className="w-full bg-muted h-2 rounded-full overflow-hidden">
                                 <div
-                                    className={cn('h-full transition-all duration-700 ease-out', scoreColor(report.trustScore))}
+                                    className={cn('h-full transition-[width,background-color] duration-700 ease-out', scoreColor(report.trustScore))}
                                     style={{ width: `${report.trustScore ?? 0}%` }}
                                 />
                             </div>

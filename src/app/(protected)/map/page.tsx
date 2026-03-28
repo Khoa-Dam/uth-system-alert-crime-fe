@@ -495,7 +495,7 @@ const CrimeMapContent = () => {
                 variant="outline"
                 size="icon"
                 onClick={handleLocationButtonClick}
-                className="absolute bottom-6 right-12 z-44 rounded-full shadow-lg pointer-events-auto h-12 w-12 group bg-white hover:bg-blue-50 hover:border-blue-300 transition-all"
+                className="absolute bottom-6 right-12 z-44 rounded-full shadow-lg pointer-events-auto h-12 w-12 group bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors"
                 title="Vị trí của tôi"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"

@@ -154,5 +154,6 @@ class WantedCriminalService {
     }
 }
 
-export default new WantedCriminalService();
+const wantedCriminalService = new WantedCriminalService();
+export default wantedCriminalService;
 

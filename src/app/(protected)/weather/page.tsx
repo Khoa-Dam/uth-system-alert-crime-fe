@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -70,12 +71,12 @@ export default function WeatherPage() {
             <Card key={news.id} className="border border-border/70 overflow-hidden">
                 {news.imageUrl && (
                     <div className="relative h-40 w-full overflow-hidden bg-muted">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
+                        <Image
                             src={news.imageUrl}
                             alt={news.title}
-                            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
-                            loading="lazy"
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover transition-transform duration-300 hover:scale-105"
                         />
                     </div>
                 )}

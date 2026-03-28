@@ -74,7 +74,7 @@ function FeatureCard({
     desc: string;
 }) {
     return (
-        <Card className="group bg-white border-slate-200 shadow-md hover:shadow-xl transition-all duration-300">
+        <Card className="group bg-white border-slate-200 shadow-md hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="space-y-4">
                 <div className="inline-flex items-center justify-center rounded-2xl border border-slate-100 bg-slate-50 p-4 transition-transform group-hover:scale-105">
                     {icon}

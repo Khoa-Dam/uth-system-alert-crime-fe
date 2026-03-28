@@ -76,5 +76,6 @@ class WeatherNewsService {
     }
 }
 
-export default new WeatherNewsService();
+const weatherNewsService = new WeatherNewsService();
+export default weatherNewsService;
 
