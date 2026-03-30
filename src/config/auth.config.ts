@@ -136,7 +136,8 @@ export const authConfig = {
             // Force sign out if token refresh failed
             if (token.error) {
                 console.error('[Session Callback] Token refresh error detected, invalidating session')
-                return null as unknown as Session  // This will force logout
+                // Return session with error flag — client will detect and sign out
+                return { ...session, error: token.error } as unknown as Session
             }
 
             if (token) {

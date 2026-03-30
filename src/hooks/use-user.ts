@@ -1,16 +1,24 @@
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+import { useEffect } from "react"
 
 /**
  * Custom hook to get current user information from session
- * 
+ *
  * @returns User information with formatted name and role
  */
 export function useUser() {
     const { data: session, status } = useSession()
 
+    // Auto sign out if session has error (e.g. token refresh failed)
+    useEffect(() => {
+        if ((session as unknown as { error?: string })?.error) {
+            signOut({ callbackUrl: '/login' })
+        }
+    }, [session])
+
     const user = session?.user
-    const isAuthenticated = !!session
-    const isLoading = status === "loading"
+    const isAuthenticated = status === 'authenticated'
+    const isLoading = status === 'loading'
 
     // Format user name - fallback to email or default
     const userName = user?.name || user?.email || "Người dùng"
