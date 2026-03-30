@@ -61,7 +61,7 @@ export function useCreateReport() {
     return useMutation({
         mutationFn: (payload: CreateCrimeReportDto) => reportService.create(payload),
         onSuccess: (data) => {
-            const normalized = normalizeReport(data);
+            normalizeReport(data);
             // Update all report lists
             queryClient.invalidateQueries({ queryKey: reportsKeys.lists() });
             // Update my reports

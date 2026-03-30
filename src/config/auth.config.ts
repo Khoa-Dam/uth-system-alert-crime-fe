@@ -1,4 +1,4 @@
-import type { NextAuthConfig } from "next-auth"
+import type { NextAuthConfig, Session } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { env } from "../lib/env"
 import { isPublicRoute, isAuthRoute, DEFAULT_LOGIN_REDIRECT } from "./routes"
@@ -107,7 +107,7 @@ export const authConfig = {
             // Force sign out if token refresh failed
             if (token.error) {
                 console.error('[Session Callback] Token refresh error detected, invalidating session')
-                return null as any  // This will force logout
+                return null as unknown as Session  // This will force logout
             }
 
             if (token) {
@@ -186,7 +186,7 @@ export const authConfig = {
 
                         // Check if it's a network error (backend not running)
                         const errorMessage = error.message.toLowerCase()
-                        const errorCause = error.cause as any
+                        const errorCause = error.cause as Record<string, unknown>;
 
                         if (errorMessage.includes('fetch failed') ||
                             errorMessage.includes('failed to fetch') ||

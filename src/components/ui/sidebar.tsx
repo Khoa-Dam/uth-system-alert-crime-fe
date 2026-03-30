@@ -61,7 +61,7 @@ export function SidebarMenuItem({ children }: { children: React.ReactNode }) {
     return <li className="">{children}</li>
 }
 
-export function SidebarMenuButton({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) {
+export function SidebarMenuButton({ children }: { children: React.ReactNode }) {
     return (
         <button
             className={cn(

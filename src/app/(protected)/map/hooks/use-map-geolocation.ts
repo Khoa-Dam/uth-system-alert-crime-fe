@@ -1,4 +1,4 @@
-'use client';
+import type { LeafletMap, LeafletMarker, LeafletWindow } from '@/types/leaflet-manual';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { toast } from 'sonner';
@@ -7,22 +7,21 @@ import { VerificationCrimeReport } from '@/types/map';
 
 interface UseMapGeolocationProps {
     isLeafletLoaded: boolean;
-    mapInstanceRef: React.MutableRefObject<any>;
+    mapInstanceRef: React.MutableRefObject<LeafletMap | null>;
     reports: VerificationCrimeReport[];
 }
 
 export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: UseMapGeolocationProps) => {
-    const userMarkerRef = useRef<any>(null);
+    const userMarkerRef = useRef<LeafletMarker | null>(null);
     const watchIdRef = useRef<number | null>(null);
 
     const [hasLocated, setHasLocated] = useState(false);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
-    const [alertedReportIds, setAlertedReportIds] = useState<Set<string>>(new Set());
     const [currentLocation, setCurrentLocation] = useState<{ lat: number; lng: number } | null>(null);
 
 
     const createUserMarker = useCallback((latitude: number, longitude: number, accuracy: number) => {
-        const L = (window as any).L;
+        const L = (window as unknown as LeafletWindow).L;
         const map = mapInstanceRef.current;
         if (!L || !map) return null;
 
@@ -76,7 +75,7 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
         navigator.geolocation.getCurrentPosition(
             ({ coords }) => {
                 const map = mapInstanceRef.current;
-                const L = (window as any).L;
+                const L = (window as unknown as LeafletWindow).L;
                 if (!map || !L) return;
 
                 // Cảnh báo nếu độ chính xác quá thấp
@@ -100,7 +99,7 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
                 map.flyTo([coords.latitude, coords.longitude], 15, { duration: 1.1 });
                 setHasLocated(true);
             },
-            (error) => {
+            () => {
                 toast.error('Không thể xác định vị trí của bạn, hãy cho phép ở trình duyệt');
             }
         );
@@ -124,7 +123,7 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
             return;
         }
 
-        const L = (window as any).L;
+        const L = (window as unknown as LeafletWindow).L;
         if (!L) return;
 
         const handlePositionChange = (pos: GeolocationPosition) => {
@@ -145,25 +144,15 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
             reports.forEach((report) => {
                 if (!report.lat || !report.lng) return;
                 const distance = getDistanceFromLatLonInMeters(latitude, longitude, report.lat, report.lng);
-                setAlertedReportIds((prev) => {
-                    const next = new Set(prev);
-                    if (distance < 500) {
-                        // Nếu trong vùng nguy hiểm và chưa cảnh báo
-                        if (!prev.has(report.id)) {
-                            setAlertMessage(
-                                `Bạn đang ở gần khu vực "${report.title}" (~${Math.round(distance)}m). Hãy cẩn thận!`
-                            );
-                            if (navigator.vibrate) {
-                                navigator.vibrate([400, 200, 400]);
-                            }
-                            next.add(report.id);
-                        }
-                    } else {
-                        // Nếu rời xa khỏi vùng nguy hiểm, xóa để có thể cảnh báo lại khi quay lại
-                        next.delete(report.id);
+                
+                if (distance < 500) {
+                    setAlertMessage(
+                        `Bạn đang ở gần khu vực "${report.title}" (~${Math.round(distance)}m). Hãy cẩn thận!`
+                    );
+                    if (navigator.vibrate) {
+                        navigator.vibrate([400, 200, 400]);
                     }
-                    return next;
-                });
+                }
             });
         };
 

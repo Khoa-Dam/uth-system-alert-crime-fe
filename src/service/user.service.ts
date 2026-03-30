@@ -1,4 +1,5 @@
 import apiClient from '@/utils/apiClient.util';
+import { handleApiError } from '@/utils/error.util';
 
 const USER_BASE = '/users';
 
@@ -94,15 +95,8 @@ class UserService {
     /**
      * Centralized error handler
      */
-    private handleError(error: any, defaultMessage: string): never {
-        const errorData = error?.response?.data;
-        const errorMessage =
-            errorData?.message ||
-            errorData?.error ||
-            (errorData && typeof errorData === 'string' ? errorData : null) ||
-            error?.message ||
-            defaultMessage;
-        throw new Error(errorMessage);
+    private handleError(error: unknown, defaultMessage: string): never {
+        handleApiError(error, defaultMessage);
     }
 }
 

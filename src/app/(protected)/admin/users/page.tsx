@@ -86,8 +86,8 @@ export default function AdminUsersPage() {
             toast.success('Tạo người dùng thành công');
             setCreateDialogOpen(false);
             resetForm();
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể tạo người dùng');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể tạo người dùng');
         }
     };
 
@@ -106,8 +106,8 @@ export default function AdminUsersPage() {
             setEditDialogOpen(false);
             setSelectedUser(null);
             resetForm();
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể cập nhật người dùng');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể cập nhật người dùng');
         }
     };
 
@@ -119,8 +119,8 @@ export default function AdminUsersPage() {
             toast.success('Xóa người dùng thành công');
             setDeleteDialogOpen(false);
             setSelectedUser(null);
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể xóa người dùng');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể xóa người dùng');
         }
     };
 

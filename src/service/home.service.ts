@@ -1,4 +1,5 @@
 import apiClient from '@/utils/apiClient.util';
+import { handleApiError } from '@/utils/error.util';
 
 export interface HomeWantedCriminal {
     id: string;
@@ -26,14 +27,8 @@ class HomeService {
         try {
             const { data } = await apiClient.get<HomeResponse>('/home');
             return data;
-        } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải dữ liệu trang chủ.';
-            throw new Error(errorMessage);
+        } catch (error) {
+            handleApiError(error, 'Không thể tải dữ liệu trang chủ.');
         }
     }
 }

@@ -77,7 +77,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 redirect: false,
             })
 
-            const result = await Promise.race([signInPromise, timeoutPromise]) as any
+            const result = await Promise.race([signInPromise, timeoutPromise]) as { error?: string; ok?: boolean };
 
             if (result?.error) {
                 // NextAuth doesn't pass custom error messages, so we check for common error types
@@ -104,16 +104,11 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 setError('Không thể kết nối đến server. Vui lòng kiểm tra lại kết nối hoặc đảm bảo server đã được khởi động.')
                 toast.error('Không thể kết nối đến server. Vui lòng kiểm tra lại kết nối.')
             }
-        } catch (err: any) {
-            if (err?.message?.includes('Timeout') || err?.message?.includes('CONNECTION_ERROR')) {
-                const errorMsg = 'Không thể kết nối đến server. Vui lòng đảm bảo server backend đã được khởi động.'
-                setError(errorMsg)
-                toast.error(errorMsg)
-            } else {
-                const errorMessage = err?.message || 'Đăng nhập thất bại. Vui lòng thử lại.'
-                setError(errorMessage)
-                toast.error(errorMessage)
-            }
+        } catch (err: unknown) {
+            console.error('Login error:', err);
+            const errorMessage = (err as Error)?.message || 'Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại sau.';
+            setError(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setIsLoading(false)
         }

@@ -98,16 +98,16 @@ export function SignupForm({ className, ...props }: React.ComponentPropsWithoutR
                 router.push(redirectTo)
                 router.refresh()
             }
-        } catch (err: any) {
-            console.error('[Signup] Error:', err)
-            console.error('[Signup] Error response:', err?.response?.data)
-            console.error('[Signup] Error message:', err?.message)
+        } catch (err: unknown) {
+            console.error('Signup error:', err);
+            setError((err as Error)?.message || 'Có lỗi xảy ra khi đăng ký. Vui lòng thử lại sau.');
+            // The original line `console.error('[Signup] Error response:', err?.response?.data)` was removed by the instruction.
+            // The original line `console.error('[Signup] Error message:', err?.message)` was replaced by the instruction.
+            console.error('[Signup] Error message:', (err as Error)?.message)
 
             // Error đã được format trong authService
-            const errorMessage = err?.message ||
-                err?.response?.data?.message ||
-                err?.response?.data?.error ||
-                err?.response?.data ||
+            const errorMessage = (err as Error)?.message ||
+                (err as { response?: { data?: string } })?.response?.data ||
                 'Đăng ký thất bại. Vui lòng thử lại.'
 
             setError(typeof errorMessage === 'string' ? errorMessage : JSON.stringify(errorMessage))

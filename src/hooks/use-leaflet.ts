@@ -7,7 +7,7 @@ export const useLeaflet = () => {
 
   useEffect(() => {
     const checkLeafletReady = () => {
-      const L = (window as any).L;
+      const L = (window as unknown as import('@/types/leaflet-manual').LeafletWindow).L;
       if (L && typeof L.map === 'function') {
         setIsLoaded(true);
         return true;

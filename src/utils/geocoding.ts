@@ -5,7 +5,8 @@ export interface GeocodingResult {
     display_name: string;
     lat: string;
     lon: string;
-    address?: Record<string, any>;
+    place_id: number;
+    address?: Record<string, string>;
 }
 
 export async function searchAddress(query: string): Promise<GeocodingResult[]> {
@@ -25,7 +26,7 @@ export async function searchAddress(query: string): Promise<GeocodingResult[]> {
     }
 }
 
-export async function reverseGeocode(lat: number, lng: number): Promise<{ display_name: string; address?: Record<string, any> } | null> {
+export async function reverseGeocode(lat: number, lng: number): Promise<{ display_name: string; address?: Record<string, string> } | null> {
     const url = `${NOMINATIM_BASE}/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`;
     try {
         const res = await fetch(url, { headers: DEFAULT_HEADERS });

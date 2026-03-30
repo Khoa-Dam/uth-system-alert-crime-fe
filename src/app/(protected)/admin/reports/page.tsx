@@ -61,8 +61,8 @@ export default function AdminReportsPage() {
             toast.success('Đã xác minh báo cáo thành công');
             setVerifyDialogOpen(false);
             setSelectedReport(null);
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể xác minh báo cáo');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể xác minh báo cáo');
         }
     };
 

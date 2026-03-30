@@ -1,4 +1,6 @@
 import apiClient from '@/utils/apiClient.util';
+import { handleApiError } from '@/utils/error.util';
+import axios from 'axios';
 
 const REPORT_BASE = '/crime-reports';
 
@@ -137,15 +139,8 @@ export interface VoteStatus {
 }
 
 class ReportService {
-    private handleError(error: any, defaultMessage: string): never {
-        const errorData = error?.response?.data;
-        const errorMessage =
-            errorData?.message ||
-            errorData?.error ||
-            (errorData && typeof errorData === 'string' ? errorData : null) ||
-            error?.message ||
-            defaultMessage;
-        throw new Error(errorMessage);
+    private handleError(error: unknown, defaultMessage: string): never {
+        handleApiError(error, defaultMessage);
     }
 
     /**
@@ -159,7 +154,7 @@ class ReportService {
                 payload
             );
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tạo báo cáo. Vui lòng thử lại.');
         }
     }
@@ -172,7 +167,7 @@ class ReportService {
             const query = type ? `?type=${encodeURIComponent(type)}` : '';
             const { data } = await apiClient.get<CrimeReportResponse[]>(`${REPORT_BASE}${query}`);
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tải danh sách báo cáo. Vui lòng thử lại.');
         }
     }
@@ -184,7 +179,7 @@ class ReportService {
         try {
             const { data } = await apiClient.post<CrimeReportResponse>(`${REPORT_BASE}/${id}/confirm`);
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể xác nhận báo cáo. Vui lòng thử lại.');
         }
     }
@@ -196,7 +191,7 @@ class ReportService {
         try {
             const { data } = await apiClient.post<CrimeReportResponse>(`${REPORT_BASE}/${id}/dispute`);
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể báo cáo sai lệch. Vui lòng thử lại.');
         }
     }
@@ -208,7 +203,7 @@ class ReportService {
         try {
             const { data } = await apiClient.put<CrimeReportResponse>(`${REPORT_BASE}/${id}/verify`);
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể xác minh báo cáo. Vui lòng thử lại.');
         }
     }
@@ -222,8 +217,8 @@ class ReportService {
                 `${REPORT_BASE}/${id}`
             );
             return data;
-        } catch (error: any) {
-            if (error?.response?.status === 404) {
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
                 throw new Error('Không tìm thấy báo cáo');
             }
             this.handleError(error, 'Không thể tải báo cáo. Vui lòng thử lại.');
@@ -239,7 +234,7 @@ class ReportService {
                 `${REPORT_BASE}/district/${encodeURIComponent(district)}`
             );
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tải báo cáo theo quận. Vui lòng thử lại.');
         }
     }
@@ -253,7 +248,7 @@ class ReportService {
                 `${REPORT_BASE}/city/${encodeURIComponent(province)}`
             );
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tải báo cáo theo tỉnh/thành phố. Vui lòng thử lại.');
         }
     }
@@ -267,7 +262,7 @@ class ReportService {
                 `${REPORT_BASE}/heatmap`
             );
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tải dữ liệu heatmap. Vui lòng thử lại.');
         }
     }
@@ -281,7 +276,7 @@ class ReportService {
                 `${REPORT_BASE}/statistics`
             );
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tải thống kê. Vui lòng thử lại.');
         }
     }
@@ -310,7 +305,7 @@ class ReportService {
                 `${REPORT_BASE}/nearby?${params.toString()}`
             );
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tải cảnh báo gần đây. Vui lòng thử lại.');
         }
     }
@@ -323,7 +318,7 @@ class ReportService {
         try {
             const { data } = await apiClient.get<CrimeReportResponse[]>(`${REPORT_BASE}/me`);
             return data;
-        } catch (error: any) {
+        } catch (error) {
             this.handleError(error, 'Không thể tải danh sách báo cáo của bạn. Vui lòng thử lại.');
         }
     }
@@ -347,11 +342,11 @@ class ReportService {
                 } : undefined
             );
             return data;
-        } catch (error: any) {
-            if (error?.response?.status === 400) {
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 400) {
                 throw new Error('Bạn không có quyền chỉnh sửa báo cáo này');
             }
-            if (error?.response?.status === 404) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
                 throw new Error('Không tìm thấy báo cáo');
             }
             this.handleError(error, 'Không thể cập nhật báo cáo. Vui lòng thử lại.');
@@ -366,11 +361,11 @@ class ReportService {
         try {
             const { data } = await apiClient.delete<{ message: string }>(`${REPORT_BASE}/${id}`);
             return data;
-        } catch (error: any) {
-            if (error?.response?.status === 400) {
+        } catch (error) {
+            if (axios.isAxiosError(error) && error.response?.status === 400) {
                 throw new Error('Bạn không có quyền xóa báo cáo này');
             }
-            if (error?.response?.status === 404) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
                 throw new Error('Không tìm thấy báo cáo');
             }
             this.handleError(error, 'Không thể xóa báo cáo. Vui lòng thử lại.');
@@ -385,9 +380,9 @@ class ReportService {
         try {
             const { data } = await apiClient.get<VoteStatus>(`${REPORT_BASE}/${id}/vote-status`);
             return data;
-        } catch (error: any) {
+        } catch (error) {
             // If endpoint doesn't exist, return default (can vote)
-            if (error?.response?.status === 404) {
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
                 return {
                     hasConfirmed: false,
                     hasDisputed: false,

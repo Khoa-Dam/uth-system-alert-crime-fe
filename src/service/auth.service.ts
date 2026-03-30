@@ -1,4 +1,5 @@
 import apiClient from '@/utils/apiClient.util';
+import { handleApiError } from '@/utils/error.util';
 
 const AUTH_BASE = '/auth';
 
@@ -36,21 +37,9 @@ class AuthService {
         try {
             const { data } = await apiClient.post(`${AUTH_BASE}/signup`, payload);
             return data;
-        } catch (error: any) {
-            console.error('[AuthService] Signup error:', error)
-            console.error('[AuthService] Error response:', error?.response?.data)
-            console.error('[AuthService] Error status:', error?.response?.status)
-
-            // Axios throws error for status >= 400
-            // Extract error message from response
-            const errorData = error?.response?.data;
-            const errorMessage = errorData?.message ||
-                errorData?.error ||
-                (errorData && typeof errorData === 'string' ? errorData : null) ||
-                error?.message ||
-                (error?.response?.status === 400 ? 'Dữ liệu không hợp lệ. Vui lòng kiểm tra lại.' : 'Đăng ký thất bại. Vui lòng thử lại.');
-
-            throw new Error(errorMessage);
+        } catch (error) {
+            console.error('[AuthService] Signup error:', error);
+            handleApiError(error, 'Đăng ký thất bại. Vui lòng thử lại.');
         }
     }
 

@@ -18,12 +18,11 @@ const CustomTechEarth = () => {
     const [rotation, setRotation] = useState(0);
     const requestRef = useRef<number | null>(null);
 
-    const animate = () => {
-        setRotation((prev) => prev + 0.002);
-        requestRef.current = requestAnimationFrame(animate);
-    };
-
     useEffect(() => {
+        const animate = () => {
+            setRotation((prev) => prev + 0.002);
+            requestRef.current = requestAnimationFrame(animate);
+        };
         requestRef.current = requestAnimationFrame(animate);
         return () => {
             if (requestRef.current) {

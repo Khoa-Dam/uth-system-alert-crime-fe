@@ -1,4 +1,5 @@
 import apiClient from '@/utils/apiClient.util';
+import { handleApiError } from '@/utils/error.util';
 
 const WANTED_CRIMINAL_BASE = '/wanted-criminals';
 
@@ -51,21 +52,15 @@ class WantedCriminalService {
      */
     async findAll(page = 1, limit = 9, search?: string, name?: string, crime?: string): Promise<PaginatedResponse<WantedCriminalResponse>> {
         try {
-            const params: any = { page, limit };
+            const params: Record<string, string | number> = { page, limit };
             if (search) params.search = search;
             if (name) params.name = name;
             if (crime) params.crime = crime;
 
             const { data } = await apiClient.get<PaginatedResponse<WantedCriminalResponse>>(WANTED_CRIMINAL_BASE, { params });
             return data;
-        } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải danh sách đối tượng truy nã. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+        } catch (error) {
+            handleApiError(error, 'Không thể tải danh sách đối tượng truy nã. Vui lòng thử lại.');
         }
     }
 
@@ -77,14 +72,8 @@ class WantedCriminalService {
         try {
             const { data } = await apiClient.get<WantedCriminalResponse>(`${WANTED_CRIMINAL_BASE}/${id}`);
             return data;
-        } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                error?.message ||
-                'Không thể tải thông tin đối tượng truy nã. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+        } catch (error) {
+            handleApiError(error, 'Không thể tải thông tin đối tượng truy nã. Vui lòng thử lại.');
         }
     }
 
@@ -99,15 +88,8 @@ class WantedCriminalService {
                 payload
             );
             return data;
-        } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                (errorData && typeof errorData === 'string' ? errorData : null) ||
-                error?.message ||
-                'Không thể tạo đối tượng truy nã. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+        } catch (error) {
+            handleApiError(error, 'Không thể tạo đối tượng truy nã. Vui lòng thử lại.');
         }
     }
 
@@ -122,15 +104,8 @@ class WantedCriminalService {
                 payload
             );
             return data;
-        } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                (errorData && typeof errorData === 'string' ? errorData : null) ||
-                error?.message ||
-                'Không thể cập nhật đối tượng truy nã. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+        } catch (error) {
+            handleApiError(error, 'Không thể cập nhật đối tượng truy nã. Vui lòng thử lại.');
         }
     }
 
@@ -141,15 +116,8 @@ class WantedCriminalService {
     async delete(id: string): Promise<void> {
         try {
             await apiClient.delete(`${WANTED_CRIMINAL_BASE}/${id}`);
-        } catch (error: any) {
-            const errorData = error?.response?.data;
-            const errorMessage =
-                errorData?.message ||
-                errorData?.error ||
-                (errorData && typeof errorData === 'string' ? errorData : null) ||
-                error?.message ||
-                'Không thể xóa đối tượng truy nã. Vui lòng thử lại.';
-            throw new Error(errorMessage);
+        } catch (error) {
+            handleApiError(error, 'Không thể xóa đối tượng truy nã. Vui lòng thử lại.');
         }
     }
 }

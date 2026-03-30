@@ -34,7 +34,7 @@ export interface ReportLocationData {
     lat: number;
     lng: number;
     address: string;
-    addressDetails?: Record<string, any>;
+    addressDetails?: Record<string, string>;
 }
 
 export interface ReportFormPayload {
@@ -91,12 +91,12 @@ const ReportForm: React.FC<ReportFormProps> = ({ locationData, onClose, onSubmit
         type: (report?.type as CrimeType) || CrimeType.CuopGiat,
         description: report?.description || '',
         attachmentsInput: '',
-        areaCode: report?.areaCode || '',
-        province: report?.province || locationData.addressDetails?.city || locationData.addressDetails?.province || '',
-        district: report?.district || locationData.addressDetails?.city_district || locationData.addressDetails?.district || '',
-        ward: report?.ward || locationData.addressDetails?.suburb || locationData.addressDetails?.neighbourhood || '',
-        street: report?.street || locationData.addressDetails?.road || '',
-        source: report?.source || 'Người dùng báo cáo',
+        areaCode: (report?.areaCode || '') as string,
+        province: (report?.province || locationData.addressDetails?.city || locationData.addressDetails?.province || '') as string,
+        district: (report?.district || locationData.addressDetails?.city_district || locationData.addressDetails?.district || '') as string,
+        ward: (report?.ward || locationData.addressDetails?.suburb || locationData.addressDetails?.neighbourhood || '') as string,
+        street: (report?.street || locationData.addressDetails?.road || '') as string,
+        source: (report?.source || 'Người dùng báo cáo') as string,
         severity: report?.severity ?? 3,
         reportedAt: formatDateTimeLocal(report?.reportedAt),
     }));

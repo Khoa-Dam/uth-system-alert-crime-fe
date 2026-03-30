@@ -104,8 +104,8 @@ export default function AdminWantedPage() {
             toast.success('Tạo đối tượng truy nã thành công');
             setCreateDialogOpen(false);
             resetForm();
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể tạo đối tượng truy nã');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể tạo đối tượng truy nã');
         }
     };
 
@@ -128,8 +128,8 @@ export default function AdminWantedPage() {
             setEditDialogOpen(false);
             setSelectedCriminal(null);
             resetForm();
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể cập nhật đối tượng truy nã');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể cập nhật đối tượng truy nã');
         }
     };
 
@@ -141,8 +141,8 @@ export default function AdminWantedPage() {
             toast.success('Xóa đối tượng truy nã thành công');
             setDeleteDialogOpen(false);
             setSelectedCriminal(null);
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể xóa đối tượng truy nã');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể xóa đối tượng truy nã');
         }
     };
 

@@ -223,7 +223,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                 setLoadingVoteStatus(true);
                 const status = await reportService.getVoteStatus(report.id);
                 setVoteStatus(status);
-            } catch (error) {
+            } catch {
                 // If error (e.g., not authenticated), set default
                 setVoteStatus({
                     hasConfirmed: false,
@@ -254,7 +254,7 @@ const ReportCard: React.FC<ReportCardProps> = ({
                 try {
                     const status = await reportService.getVoteStatus(report.id);
                     setVoteStatus(status);
-                } catch (error) {
+                } catch {
                     // Silently fail
                 }
             };

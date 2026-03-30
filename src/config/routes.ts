@@ -63,7 +63,7 @@ export const UNAUTHORIZED_REDIRECT = "/unauthorized";
  */
 export function isPublicRoute(pathname: string): boolean {
     // Check exact match first
-    if (publicRoutes.includes(pathname as any)) {
+    if (publicRoutes.includes(pathname as typeof publicRoutes[number])) {
         return true
     }
     // Check if pathname starts with any public route (but not just "/")

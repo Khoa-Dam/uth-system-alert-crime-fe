@@ -1,5 +1,6 @@
-
 'use client';
+
+import type { LeafletMarker, LeafletWindow } from '@/types/leaflet-manual';
 
 import { useEffect, useMemo, useRef, useState, Suspense } from 'react'; 
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -28,7 +29,7 @@ import { Plus, Loader2 } from 'lucide-react';
 
 const CrimeMapContent = () => {
     const searchParams = useSearchParams();
-    const reportMarkerRef = useRef<any>(null);
+    const reportMarkerRef = useRef<LeafletMarker | null>(null);
     const hasHandledQueryParams = useRef<string>('');
 
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
@@ -83,7 +84,7 @@ const CrimeMapContent = () => {
     // Xử lý click trên map để đóng report card
     useEffect(() => {
         const map = mapInstanceRef.current;
-        const L = (window as any).L;
+        const L = (window as unknown as LeafletWindow).L;
         if (!map || !L) return;
         const handler = () => setSelectedReportId(null);
         map.on('click', handler);
@@ -158,7 +159,7 @@ const CrimeMapContent = () => {
             return;
         }
 
-        const L = (window as any).L;
+        const L = (window as unknown as { L: typeof import('leaflet') }).L;
         const map = mapInstanceRef.current;
         if (!L || !map) return;
 
@@ -221,7 +222,7 @@ const CrimeMapContent = () => {
             map.removeLayer(marker);
             reportMarkerRef.current = null;
         };
-    }, [isReportingMode, showReportForm, isLeafletLoaded]);
+    }, [isReportingMode, showReportForm, isLeafletLoaded, mapInstanceRef]);
 
     const handleSelectSearchLocation = async (lat: number, lng: number) => {
         const map = mapInstanceRef.current;
@@ -291,9 +292,9 @@ const CrimeMapContent = () => {
             
             // Clear query params
             router.replace('/map');
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Report submit error:', err);
-            toast.error(err?.message || 'Không thể xử lý báo cáo');
+            toast.error(err instanceof Error ? err.message : 'Không thể xử lý báo cáo');
         } finally {
             setIsSubmitting(false);
         }
@@ -314,8 +315,8 @@ const CrimeMapContent = () => {
         try {
             await confirmReportMutation.mutateAsync(id);
             toast.success('Đã gửi xác nhận (+5 điểm tin cậy)');
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể xác nhận báo cáo');
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : 'Không thể xác nhận báo cáo');
         } finally {
             setActionState({ id: null, type: null });
         }
@@ -326,8 +327,8 @@ const CrimeMapContent = () => {
         try {
             await disputeReportMutation.mutateAsync(id);
             toast.error('Đã báo cáo sai lệch (-10 điểm tin cậy)');
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể báo cáo sai lệch');
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : 'Không thể báo cáo sai lệch');
         } finally {
             setActionState({ id: null, type: null });
         }
@@ -365,8 +366,8 @@ const CrimeMapContent = () => {
             if (selectedReportId === id) {
                 setSelectedReportId(null);
             }
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể xóa báo cáo');
+        } catch (err: unknown) {
+            toast.error(err instanceof Error ? err.message : 'Không thể xóa báo cáo');
         }
     };
 

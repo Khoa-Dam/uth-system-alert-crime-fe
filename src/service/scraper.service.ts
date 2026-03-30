@@ -1,4 +1,5 @@
 import apiClient from '@/utils/apiClient.util';
+import { handleApiError } from '@/utils/error.util';
 
 const SCRAPER_BASE = '/scraper';
 
@@ -10,7 +11,7 @@ export interface ScraperResponse {
 }
 
 export interface WantedCriminalsScraperResponse extends ScraperResponse {
-    criminals: any[];
+    criminals: Record<string, unknown>[];
 }
 
 export interface WeatherNewsScraperResponse extends ScraperResponse {
@@ -18,7 +19,7 @@ export interface WeatherNewsScraperResponse extends ScraperResponse {
     updated: number;
     deleted: number;
     errors: number;
-    news: any[];
+    news: Record<string, unknown>[];
 }
 
 export interface ScraperStatus {
@@ -42,7 +43,7 @@ class ScraperService {
      */
     async triggerWantedCriminalsScraper(pages?: number, limit?: number): Promise<WantedCriminalsScraperResponse> {
         try {
-            const params: any = {};
+            const params: Record<string, string | number> = {};
             if (pages) params.pages = pages;
             if (limit) params.limit = limit;
 
@@ -86,7 +87,7 @@ class ScraperService {
     /**
      * Get weather scraper status (Public)
      */
-    async getWeatherScraperStatus(): Promise<any> {
+    async getWeatherScraperStatus(): Promise<Record<string, unknown>> {
         try {
             const response = await apiClient.get(`${SCRAPER_BASE}/weather-status`);
             return response.data;
@@ -98,15 +99,8 @@ class ScraperService {
     /**
      * Centralized error handler
      */
-    private handleError(error: any, defaultMessage: string): never {
-        const errorData = error?.response?.data;
-        const errorMessage =
-            errorData?.message ||
-            errorData?.error ||
-            (errorData && typeof errorData === 'string' ? errorData : null) ||
-            error?.message ||
-            defaultMessage;
-        throw new Error(errorMessage);
+    private handleError(error: unknown, defaultMessage: string): never {
+        handleApiError(error, defaultMessage);
     }
 }
 

@@ -111,8 +111,8 @@ export default function AdminWeatherPage() {
             toast.success('Tạo tin tức thời tiết thành công');
             setCreateDialogOpen(false);
             resetForm();
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể tạo tin tức');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể tạo tin tức');
         }
     };
 
@@ -136,8 +136,8 @@ export default function AdminWeatherPage() {
             setEditDialogOpen(false);
             setSelectedNews(null);
             resetForm();
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể cập nhật tin tức');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể cập nhật tin tức');
         }
     };
 
@@ -149,8 +149,8 @@ export default function AdminWeatherPage() {
             toast.success('Xóa tin tức thành công');
             setDeleteDialogOpen(false);
             setSelectedNews(null);
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể xóa tin tức');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể xóa tin tức');
         }
     };
 

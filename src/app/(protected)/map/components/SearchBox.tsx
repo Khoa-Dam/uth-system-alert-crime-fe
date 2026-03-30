@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { searchAddress } from '@/utils/geocoding';
+import { searchAddress, GeocodingResult } from '@/utils/geocoding';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,7 +14,7 @@ interface SearchBoxProps {
 
 const SearchBox: React.FC<SearchBoxProps> = ({ onSelectLocation, disabled }) => {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<any[]>([]);
+    const [results, setResults] = useState<GeocodingResult[]>([]);
     const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const activeQueryRef = useRef('');
@@ -34,7 +34,7 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSelectLocation, disabled }) => 
                 if (activeQueryRef.current === value) {
                     setResults(data);
                 }
-            } catch (err) {
+            } catch {
                 if (activeQueryRef.current === value) {
                     setError('Không thể tìm kiếm. Vui lòng thử lại.');
                 }

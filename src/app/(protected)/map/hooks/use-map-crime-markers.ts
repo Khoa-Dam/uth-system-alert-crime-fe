@@ -1,4 +1,4 @@
-'use client';
+import type { LeafletMap, LeafletLayerGroup, LeafletWindow } from '@/types/leaflet-manual';
 
 import { useEffect } from 'react';
 import { VerificationLevel } from '@/types/map';
@@ -6,8 +6,8 @@ import { VerificationCrimeReport } from '@/types/map';
 
 interface UseMapCrimeMarkersProps {
     isLeafletLoaded: boolean;
-    mapInstanceRef: React.MutableRefObject<any>;
-    markersLayerRef: React.MutableRefObject<any>;
+    mapInstanceRef: React.MutableRefObject<LeafletMap | null>;
+    markersLayerRef: React.MutableRefObject<LeafletLayerGroup | null>;
     reports: VerificationCrimeReport[];
     onMarkerClick: (reportId: string) => void;
     selectedReportId?: string | null;
@@ -29,7 +29,7 @@ export const useMapCrimeMarkers = ({
     selectedReportId,
 }: UseMapCrimeMarkersProps) => {
     useEffect(() => {
-        const L = (window as any).L;
+        const L = (window as unknown as LeafletWindow).L;
         if (!isLeafletLoaded || !mapInstanceRef.current || !markersLayerRef.current || !L) return;
 
         markersLayerRef.current.clearLayers();
@@ -74,13 +74,13 @@ export const useMapCrimeMarkers = ({
                 zIndexOffset: isSelected ? 1000 : 0, // Đưa marker được chọn lên trên cùng
             });
 
-            marker.on('click', (e: any) => {
+            marker.on('click', (e: unknown) => {
                 L.DomEvent.stopPropagation(e);
                 onMarkerClick(report.id);
-                mapInstanceRef.current.flyTo([report.lat, report.lng], 16, { duration: 1 });
+                mapInstanceRef.current?.flyTo([report.lat as number, report.lng as number], 16, { duration: 1 });
             });
 
-            markersLayerRef.current.addLayer(marker);
+            markersLayerRef.current?.addLayer(marker);
         });
     }, [reports, isLeafletLoaded, mapInstanceRef, markersLayerRef, onMarkerClick, selectedReportId]);
 };

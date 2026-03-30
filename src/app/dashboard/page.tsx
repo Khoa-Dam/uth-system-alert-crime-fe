@@ -21,7 +21,6 @@ import {
     MapPin,
 } from 'lucide-react';
 
-import { HomeWantedCriminal } from '@/service/home.service';
 import { useHomeData } from '@/hooks/use-home-data';
 import { useStatistics, useHeatmap } from '@/hooks/use-statistics';
 

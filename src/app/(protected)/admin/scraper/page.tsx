@@ -29,8 +29,8 @@ export default function AdminScraperPage() {
                 limit: wantedCriminalsLimit
             });
             toast.success(result.message || `Đã scrape ${result.count} đối tượng truy nã`);
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể kích hoạt scraper');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể kích hoạt scraper');
         }
     };
 
@@ -41,8 +41,8 @@ export default function AdminScraperPage() {
                 result.message ||
                     `Đã scrape ${result.count} tin thời tiết (${result.imported} mới, ${result.updated} cập nhật)`
             );
-        } catch (err: any) {
-            toast.error(err?.message || 'Không thể kích hoạt scraper');
+        } catch (err: unknown) {
+            toast.error((err as Error)?.message || 'Không thể kích hoạt scraper');
         }
     };
 

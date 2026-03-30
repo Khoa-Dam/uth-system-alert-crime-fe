@@ -1,17 +1,17 @@
-'use client';
+import type { LeafletMap, LeafletLayerGroup, LeafletWindow } from '@/types/leaflet-manual';
 
 import { useEffect, useRef } from 'react';
 
 export const useMapInit = (isLeafletLoaded: boolean) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
-    const mapInstanceRef = useRef<any>(null);
-    const markersLayerRef = useRef<any>(null);
+    const mapInstanceRef = useRef<LeafletMap | null>(null);
+    const markersLayerRef = useRef<LeafletLayerGroup | null>(null);
 
     useEffect(() => {
         if (!isLeafletLoaded || !mapContainerRef.current || mapInstanceRef.current) return;
 
         try {
-            const L = (window as any).L;
+            const L = (window as unknown as LeafletWindow).L;
             if (!L || typeof L.map !== 'function') return;
 
             const map = L.map(mapContainerRef.current, { zoomControl: false, tap: true }).setView([10.7769, 106.7009], 13);

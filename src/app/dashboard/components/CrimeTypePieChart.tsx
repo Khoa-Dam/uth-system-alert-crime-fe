@@ -5,7 +5,7 @@ import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from 'recharts';
 interface CrimeTypeData {
     label: string;
     count: number;
-    [key: string]: any;
+    [key: string]: string | number;
 }
 
 interface CrimeTypePieChartProps {
