@@ -1,5 +1,6 @@
 import type { NextAuthConfig, Session } from "next-auth"
 import Credentials from "next-auth/providers/credentials"
+import Google from "next-auth/providers/google"
 import { env } from "../lib/env"
 import { isPublicRoute, isAuthRoute, DEFAULT_LOGIN_REDIRECT } from "./routes"
 import type { JWT } from "next-auth/jwt"
@@ -82,6 +83,34 @@ export const authConfig = {
         async jwt({ token, user, account }) {
             // Initial sign in
             if (account && user) {
+                // Google OAuth: exchange Google token with BE to get JWT
+                if (account.provider === 'google' && account.id_token) {
+                    const apiUrl = env.NEXT_PUBLIC_API_BASE_URL.endsWith('/api')
+                        ? `${env.NEXT_PUBLIC_API_BASE_URL}/auth/google`
+                        : `${env.NEXT_PUBLIC_API_BASE_URL}/api/auth/google`
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idToken: account.id_token }),
+                    })
+
+                    if (!response.ok) {
+                        console.error('[JWT Callback] Google login failed')
+                        return { ...token, error: 'GoogleLoginError' }
+                    }
+
+                    const data = await response.json()
+                    return {
+                        accessToken: data.accessToken,
+                        refreshToken: data.refreshToken,
+                        userId: data.userId,
+                        role: data.role,
+                        accessTokenExpires: Date.now() + (3600 - 300) * 1000,
+                    }
+                }
+
+                // Credentials login
                 return {
                     accessToken: user.accessToken,
                     refreshToken: user.refreshToken,
@@ -123,6 +152,10 @@ export const authConfig = {
         },
     },
     providers: [
+        Google({
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+        }),
         Credentials({
             name: "Credentials",
             credentials: {

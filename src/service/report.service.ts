@@ -1,20 +1,11 @@
 import apiClient from '@/utils/apiClient.util';
 import { handleApiError } from '@/utils/error.util';
+import { CrimeType } from '@/types/crime';
 import axios from 'axios';
 
-const REPORT_BASE = '/crime-reports';
+export { CrimeType };
 
-// Crime Type Enum (matching backend)
-export enum CrimeType {
-    GietNguoi = 'giet_nguoi',
-    BatCoc = 'bat_coc',
-    TruyNa = 'truy_na',
-    CuopGiat = 'cuop_giat',
-    DeDoa = 'de_doa',
-    NghiPham = 'nghi_pham',
-    DangNgo = 'dang_ngo',
-    TromCap = 'trom_cap',
-}
+const REPORT_BASE = '/crime-reports';
 
 // Request DTOs
 export interface CreateCrimeReportDto {

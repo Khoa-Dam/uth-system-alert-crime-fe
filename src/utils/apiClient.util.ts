@@ -34,14 +34,14 @@ apiClient.interceptors.response.use(
         // 3. Race condition before server-side refresh completes
         if (error.response?.status === 401 && typeof window !== 'undefined') {
             console.warn('[apiClient] 401 Unauthorized - Token expired, signing out...');
-            
-            // Sign out the user and redirect to login page
-            // Server-side JWT callback will have already tried to refresh
-            // If we're here, it means refresh failed or tokens are fully expired
+
+            const { toast } = await import('sonner');
+            toast.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+
             const { signOut } = await import('next-auth/react');
-            await signOut({ 
+            await signOut({
                 callbackUrl: '/login',
-                redirect: true 
+                redirect: true
             });
         }
         

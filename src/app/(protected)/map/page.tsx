@@ -31,6 +31,7 @@ const CrimeMapContent = () => {
     const searchParams = useSearchParams();
     const reportMarkerRef = useRef<LeafletMarker | null>(null);
     const hasHandledQueryParams = useRef<string>('');
+    const markerClickedRef = useRef(false);
 
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
     const [filter, setFilter] = useState<FilterType>('all');
@@ -46,7 +47,7 @@ const CrimeMapContent = () => {
     const isLeafletLoaded = useLeaflet();
     
     // React Query Hooks
-    const { data: reports = SAMPLE_DATA, isLoading: loading, error } = useReportsQuery();
+    const { data: reports = [], isLoading: loading, error } = useReportsQuery();
     const createReportMutation = useCreateReport();
     const updateReportMutation = useUpdateReport();
     const deleteReportMutation = useDeleteReport();
@@ -77,16 +78,26 @@ const CrimeMapContent = () => {
         mapInstanceRef,
         markersLayerRef,
         reports: isReportingMode ? [] : filteredReports,
-        onMarkerClick: (reportId) => setSelectedReportId(reportId),
+        onMarkerClick: (reportId) => {
+            markerClickedRef.current = true;
+            setSelectedReportId(reportId);
+        },
         selectedReportId,
     });
 
     // Xử lý click trên map để đóng report card
+    // Kiểm tra markerClickedRef để tránh race condition với marker click handler
     useEffect(() => {
         const map = mapInstanceRef.current;
         const L = (window as unknown as LeafletWindow).L;
         if (!map || !L) return;
-        const handler = () => setSelectedReportId(null);
+        const handler = () => {
+            if (markerClickedRef.current) {
+                markerClickedRef.current = false;
+                return;
+            }
+            setSelectedReportId(null);
+        };
         map.on('click', handler);
         return () => {
             map.off('click', handler);

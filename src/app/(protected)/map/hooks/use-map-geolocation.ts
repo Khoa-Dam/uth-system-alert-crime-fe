@@ -14,6 +14,7 @@ interface UseMapGeolocationProps {
 export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: UseMapGeolocationProps) => {
     const userMarkerRef = useRef<LeafletMarker | null>(null);
     const watchIdRef = useRef<number | null>(null);
+    const alertedReportIds = useRef<Set<string>>(new Set());
 
     const [hasLocated, setHasLocated] = useState(false);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -144,14 +145,19 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
             reports.forEach((report) => {
                 if (!report.lat || !report.lng) return;
                 const distance = getDistanceFromLatLonInMeters(latitude, longitude, report.lat, report.lng);
-                
+
                 if (distance < 500) {
-                    setAlertMessage(
-                        `Bạn đang ở gần khu vực "${report.title}" (~${Math.round(distance)}m). Hãy cẩn thận!`
-                    );
-                    if (navigator.vibrate) {
-                        navigator.vibrate([400, 200, 400]);
+                    if (!alertedReportIds.current.has(report.id)) {
+                        alertedReportIds.current.add(report.id);
+                        setAlertMessage(
+                            `Bạn đang ở gần khu vực "${report.title}" (~${Math.round(distance)}m). Hãy cẩn thận!`
+                        );
+                        if (navigator.vibrate) {
+                            navigator.vibrate([400, 200, 400]);
+                        }
                     }
+                } else {
+                    alertedReportIds.current.delete(report.id);
                 }
             });
         };
@@ -159,7 +165,7 @@ export const useMapGeolocation = ({ isLeafletLoaded, mapInstanceRef, reports }: 
         watchIdRef.current = navigator.geolocation.watchPosition(
             handlePositionChange,
             (err) => console.warn('Lỗi GPS:', err),
-            { enableHighAccuracy: true }
+            { enableHighAccuracy: false, maximumAge: 10000 }
         );
 
         return () => {

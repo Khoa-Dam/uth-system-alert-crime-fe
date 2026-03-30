@@ -44,31 +44,55 @@ class AuthService {
     }
 
     async login(payload: LoginPayload) {
-        const { data } = await apiClient.post(`${AUTH_BASE}/login`, payload);
-        return data;
+        try {
+            const { data } = await apiClient.post(`${AUTH_BASE}/login`, payload);
+            return data;
+        } catch (error) {
+            console.error('[AuthService] Login error:', error);
+            handleApiError(error, 'Đăng nhập thất bại. Vui lòng thử lại.');
+        }
     }
 
     async refreshTokens(payload: RefreshPayload) {
-        const { data } = await apiClient.post(`${AUTH_BASE}/refresh`, payload);
-        return data;
+        try {
+            const { data } = await apiClient.post(`${AUTH_BASE}/refresh`, payload);
+            return data;
+        } catch (error) {
+            console.error('[AuthService] Refresh token error:', error);
+            handleApiError(error, 'Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.');
+        }
     }
 
     async changePassword(payload: ChangePasswordPayload) {
-        const { data } = await apiClient.put(`${AUTH_BASE}/change-password`, payload);
-        return data;
+        try {
+            const { data } = await apiClient.put(`${AUTH_BASE}/change-password`, payload);
+            return data;
+        } catch (error) {
+            console.error('[AuthService] Change password error:', error);
+            handleApiError(error, 'Đổi mật khẩu thất bại. Vui lòng thử lại.');
+        }
     }
 
     async forgotPassword(payload: ForgotPasswordPayload) {
-        const { data } = await apiClient.post(`${AUTH_BASE}/forgot-password`, payload);
-        return data;
+        try {
+            const { data } = await apiClient.post(`${AUTH_BASE}/forgot-password`, payload);
+            return data;
+        } catch (error) {
+            console.error('[AuthService] Forgot password error:', error);
+            handleApiError(error, 'Gửi email thất bại. Vui lòng thử lại.');
+        }
     }
 
     async resetPassword(payload: ResetPasswordPayload) {
-        const { data } = await apiClient.post(`${AUTH_BASE}/reset-password`, payload);
-        return data;
+        try {
+            const { data } = await apiClient.post(`${AUTH_BASE}/reset-password`, payload);
+            return data;
+        } catch (error) {
+            console.error('[AuthService] Reset password error:', error);
+            handleApiError(error, 'Đặt lại mật khẩu thất bại. Vui lòng thử lại.');
+        }
     }
 }
 
 const authService = new AuthService();
 export default authService;
-

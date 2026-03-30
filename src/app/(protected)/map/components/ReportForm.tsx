@@ -65,14 +65,14 @@ interface ReportFormProps {
 }
 
 const crimeTypeLabels: Record<CrimeType, string> = {
-    [CrimeType.GietNguoi]: 'Giết người',
-    [CrimeType.BatCoc]: 'Bắt cóc',
-    [CrimeType.TruyNa]: 'Truy nã',
-    [CrimeType.CuopGiat]: 'Cướp giật',
-    [CrimeType.DeDoa]: 'Đe dọa',
-    [CrimeType.NghiPham]: 'Nghi phạm',
-    [CrimeType.DangNgo]: 'Đáng ngờ',
-    [CrimeType.TromCap]: 'Trộm cắp',
+    [CrimeType.GIET_NGUOI]: 'Giết người',
+    [CrimeType.BAT_COC]: 'Bắt cóc',
+    [CrimeType.TRUY_NA]: 'Truy nã',
+    [CrimeType.CUOP_GIAT]: 'Cướp giật',
+    [CrimeType.DE_DOA]: 'Đe dọa',
+    [CrimeType.NGHI_PHAM]: 'Nghi phạm',
+    [CrimeType.DANG_NGO]: 'Đáng ngờ',
+    [CrimeType.TROM_CAP]: 'Trộm cắp',
 };
 
 /** Helper để format datetime cho input */
@@ -88,7 +88,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ locationData, onClose, onSubmit
     // Khởi tạo form với dữ liệu từ report (nếu có) hoặc giá trị mặc định
     const [formData, setFormData] = useState(() => ({
         title: report?.title || '',
-        type: (report?.type as CrimeType) || CrimeType.CuopGiat,
+        type: (report?.type as CrimeType) || CrimeType.CUOP_GIAT,
         description: report?.description || '',
         attachmentsInput: '',
         areaCode: (report?.areaCode || '') as string,
