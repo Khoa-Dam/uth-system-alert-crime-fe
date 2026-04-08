@@ -91,9 +91,12 @@ function GlobeComponent({ points = [] }: GlobeVizProps) {
         </div>
       `}
       onGlobeReady={() => {
-        globeRef.current?.controls().autoRotate = true;
-        globeRef.current?.controls().autoRotateSpeed = 0.4;
-        globeRef.current?.controls().enableZoom = false;
+        const controls = globeRef.current?.controls();
+        if (controls) {
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = 0.4;
+          controls.enableZoom = false;
+        }
       }}
     />
   );
