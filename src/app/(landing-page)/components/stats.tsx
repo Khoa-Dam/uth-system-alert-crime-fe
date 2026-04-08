@@ -2,37 +2,35 @@
 
 import React from 'react';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
 const stats = [
-    { value: 'Real‑time', label: 'Dashboard thống kê' },
-    { value: 'Bản đồ', label: 'Heatmap & marker tội phạm' },
-    { value: 'Truy nã', label: 'Đồng bộ dữ liệu thật' },
-    { value: 'Weather', label: 'Cảnh báo thiên tai' },
+  { value: 'Real-time', label: 'Dashboard thống kê', color: '#00d4ff' },
+  { value: 'Bản đồ', label: 'Heatmap & marker tội phạm', color: '#ffd700' },
+  { value: 'Truy nã', label: 'Đồng bộ dữ liệu thật', color: '#ff3b3b' },
+  { value: 'Weather', label: 'Cảnh báo thiên tai', color: '#00ff88' },
 ];
 
-export const StatsSection: React.FC = () => {
-    return (
-        <section className="py-16 relative z-10">
-            <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-                {stats.map((stat) => (
-                    <Card
-                        key={stat.label}
-                        className="bg-white border-slate-200 text-center shadow-sm"
-                    >
-                        <CardHeader className="space-y-1 pb-2">
-                            <CardTitle className="text-[18px] sm:text-3xl md:text-4xl text-slate-900">
-                                {stat.value}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="text-[12px] sm:text-sm text-slate-500 font-medium uppercase tracking-widest">
-                            {stat.label}
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-        </section>
-    );
-};
+export const StatsSection: React.FC = () => (
+  <section className="py-16 relative">
+    <div className="absolute inset-0 pointer-events-none"
+      style={{ background: 'linear-gradient(180deg, transparent, rgba(0,212,255,0.02) 50%, transparent)' }} />
+    <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+      {stats.map((stat) => (
+        <div key={stat.label}
+          className="group relative rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(12,17,32,0.6)] backdrop-blur-sm p-5 text-center overflow-hidden hover:border-[rgba(0,212,255,0.2)] transition-all duration-300">
+          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+            style={{ background: `radial-gradient(circle at center, ${stat.color}08, transparent 70%)` }} />
+          <div className="absolute bottom-0 left-0 right-0 h-px opacity-0 group-hover:opacity-60 transition-opacity"
+            style={{ background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)` }} />
 
-
+          <p className="font-mono text-xl sm:text-2xl md:text-3xl font-bold mb-2 relative"
+            style={{ color: stat.color, textShadow: `0 0 20px ${stat.color}50` }}>
+            {stat.value}
+          </p>
+          <p className="font-mono text-[9px] text-[#8899aa] uppercase tracking-widest leading-tight relative">
+            {stat.label}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+);

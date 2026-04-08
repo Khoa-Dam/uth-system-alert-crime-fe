@@ -1,114 +1,201 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronRight } from 'lucide-react';
-
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { ChevronRight, Shield, Activity, MapPin } from 'lucide-react';
 
 const GLOBE_SIZE = 450;
 const GLOBE_RADIUS = GLOBE_SIZE / 2;
 const MAP_CIRCUMFERENCE = 2 * Math.PI * GLOBE_RADIUS;
 
-interface HeroProps {
-    appUrl: string;
-}
+interface HeroProps { appUrl: string; }
 
-const CustomTechEarth = () => {
-    const [rotation, setRotation] = useState(0);
-    const requestRef = useRef<number | null>(null);
+const TechGlobe = () => {
+  const [rotation, setRotation] = useState(0);
+  const reqRef = useRef<number | null>(null);
 
-    useEffect(() => {
-        const animate = () => {
-            setRotation((prev) => prev + 0.002);
-            requestRef.current = requestAnimationFrame(animate);
-        };
-        requestRef.current = requestAnimationFrame(animate);
-        return () => {
-            if (requestRef.current) {
-                cancelAnimationFrame(requestRef.current);
-            }
-        };
-    }, []);
+  useEffect(() => {
+    const animate = () => {
+      setRotation(prev => prev + 0.0015);
+      reqRef.current = requestAnimationFrame(animate);
+    };
+    reqRef.current = requestAnimationFrame(animate);
+    return () => { if (reqRef.current) cancelAnimationFrame(reqRef.current); };
+  }, []);
 
-    const rotationRatio = (rotation % (2 * Math.PI)) / (2 * Math.PI);
-    const bgPosition = rotationRatio * MAP_CIRCUMFERENCE;
+  const bgPos = ((rotation % (2 * Math.PI)) / (2 * Math.PI)) * MAP_CIRCUMFERENCE;
 
-    return (
-        <div
-            className="relative flex items-center justify-center aspect-square w-full max-w-[450px] md:max-w-[500px] transform scale-90 md:scale-100 transition-transform duration-500"
-        >
-            <div className="absolute inset-0 rounded-full bg-[#0EA5E9] overflow-hidden border border-slate-200/60">
-                <div
-                    className="absolute top-0 left-0 h-full opacity-55"
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        backgroundImage:
-                            "url('/world-map.png')",
-                        backgroundSize: `${MAP_CIRCUMFERENCE}px 100%`,
-                        backgroundRepeat: 'repeat-x',
-                        backgroundPosition: `${-bgPosition}px center`,
-                        filter: 'saturate(1.2)',
-                    }}
-                ></div>
+  // Crime hotspot dots on Vietnam
+  const dots = [
+    { cx: '52%', cy: '41%', r: 4, color: '#ff3b3b', delay: '0s' },
+    { cx: '50%', cy: '55%', r: 5, color: '#ff3b3b', delay: '0.4s' },
+    { cx: '54%', cy: '48%', r: 3, color: '#ffd700', delay: '0.8s' },
+    { cx: '48%', cy: '35%', r: 3, color: '#ffd700', delay: '1.2s' },
+    { cx: '53%', cy: '62%', r: 4, color: '#00ff88', delay: '0.6s' },
+    { cx: '46%', cy: '50%', r: 3, color: '#00d4ff', delay: '1s' },
+  ];
 
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-size-[45px_45px] rounded-full opacity-20"></div>
-                <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.05),transparent_60%,rgba(0,0,0,0.8)_100%)] pointer-events-none"></div>
-            </div>
+  return (
+    <div className="relative flex items-center justify-center w-full max-w-[480px] mx-auto aspect-square">
+      {/* Outer glow rings */}
+      <div className="absolute inset-[-40px] rounded-full opacity-20 animate-pulse"
+        style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.3) 0%, transparent 70%)' }} />
+      <div className="absolute inset-[-20px] rounded-full border border-[rgba(0,212,255,0.1)]" />
+      <div className="absolute inset-[-8px] rounded-full border border-[rgba(0,212,255,0.15)]" />
 
-            <div className="absolute inset-[-2px] rounded-full border border-blue-500/30 blur-[1px]"></div>
-            <div className="absolute inset-[-30px] rounded-full bg-blue-500/10 blur-2xl -z-10"></div>
+      {/* Globe */}
+      <div className="relative w-full aspect-square rounded-full overflow-hidden border border-[rgba(0,212,255,0.25)]"
+        style={{ boxShadow: '0 0 60px rgba(0,212,255,0.15), inset 0 0 60px rgba(0,0,0,0.5)' }}>
+        {/* Dark ocean bg */}
+        <div className="absolute inset-0 bg-[#0a1628]" />
+
+        {/* World map */}
+        <div className="absolute inset-0 opacity-40"
+          style={{
+            backgroundImage: "url('/world-map.png')",
+            backgroundSize: `${MAP_CIRCUMFERENCE}px 100%`,
+            backgroundRepeat: 'repeat-x',
+            backgroundPosition: `${-bgPos}px center`,
+            filter: 'hue-rotate(180deg) brightness(1.5) saturate(0.6)',
+          }} />
+
+        {/* Grid overlay */}
+        <div className="absolute inset-0"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(0,212,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.06) 1px, transparent 1px)',
+            backgroundSize: '45px 45px',
+          }} />
+
+        {/* Crime dots */}
+        <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+          {dots.map((d, i) => (
+            <g key={i}>
+              <circle cx={d.cx} cy={d.cy} r={d.r * 0.4} fill={d.color} opacity="0.9" />
+              <circle cx={d.cx} cy={d.cy} r={d.r * 0.4} fill={d.color} opacity="0.5">
+                <animate attributeName="r" values={`${d.r * 0.4};${d.r * 1.2};${d.r * 0.4}`}
+                  dur="2s" repeatCount="indefinite" begin={d.delay} />
+                <animate attributeName="opacity" values="0.5;0;0.5" dur="2s" repeatCount="indefinite" begin={d.delay} />
+              </circle>
+            </g>
+          ))}
+        </svg>
+
+        {/* Sphere lighting */}
+        <div className="absolute inset-0 rounded-full"
+          style={{ background: 'radial-gradient(circle at 30% 30%, rgba(0,212,255,0.08), transparent 60%, rgba(0,0,0,0.7) 100%)' }} />
+      </div>
+
+      {/* HUD corner brackets */}
+      {[['top-2 left-2', 'border-t border-l'], ['top-2 right-2', 'border-t border-r'],
+        ['bottom-2 left-2', 'border-b border-l'], ['bottom-2 right-2', 'border-b border-r']].map(([pos, border], i) => (
+        <div key={i} className={`absolute ${pos} w-5 h-5 ${border} border-[#00d4ff] opacity-60`} />
+      ))}
+
+      {/* Floating stat badges */}
+      <div className="absolute -left-4 top-1/3 font-mono text-[9px] bg-[rgba(8,12,24,0.9)] border border-[rgba(0,212,255,0.2)] px-2 py-1 rounded text-[#00d4ff]">
+        <div className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse" />
+          LIVE
         </div>
-    );
+      </div>
+      <div className="absolute -right-6 bottom-1/3 font-mono text-[9px] bg-[rgba(8,12,24,0.9)] border border-[rgba(255,59,59,0.2)] px-2 py-1 rounded text-[#ff3b3b]">
+        <div className="flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b3b] animate-pulse" />
+          ALERT
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export const HeroSection: React.FC<HeroProps> = ({ appUrl }) => {
-    return (
-        <section className="relative pt-15 pb-10 px-6 lg:h-screen min-h-[800px] flex items-center overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-linear-to-br from-white via-blue-50 to-indigo-100 -z-20"></div>
-            <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-blue-200/40 rounded-full blur-[160px] -z-10 pointer-events-none"></div>
+  return (
+    <section className="relative min-h-screen flex items-center overflow-hidden pt-20">
+      {/* Grid bg */}
+      <div className="absolute inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }} />
+      {/* Radial glow */}
+      <div className="absolute top-1/2 left-1/4 w-[600px] h-[600px] -translate-y-1/2 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(0,212,255,0.04) 0%, transparent 70%)' }} />
+      <div className="absolute top-1/2 right-0 w-[500px] h-[500px] -translate-y-1/2 rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(255,59,59,0.04) 0%, transparent 70%)' }} />
 
-            <div className="max-w-7xl mx-auto w-full sm:px-6 py-10 flex flex-col sm:grid lg:grid-cols-2 gap-10 items-center h-full">
-                <div className="space-y-2 z-10">
-                    <Badge
-                        variant="outline"
-                        className="bg-red-100 text-red-600 border-red-200 font-semibold uppercase tracking-wider px-3 "
-                    >
-                        Global Monitoring
-                    </Badge>
+      <div className="relative z-10 max-w-7xl mx-auto w-full px-6 py-16 grid lg:grid-cols-2 gap-16 items-center">
+        {/* Left: Copy */}
+        <div className="space-y-8">
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.25em] uppercase px-3 py-1.5 rounded border border-[rgba(0,212,255,0.25)] bg-[rgba(0,212,255,0.06)] text-[#00d4ff]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ff3b3b] animate-pulse" />
+            Global Crime Monitoring System
+          </div>
 
-                    <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 leading-[1.1] tracking-tight">
-                        Bản đồ cảnh báo tội phạm
-                    </h1>
+          {/* Headline */}
+          <div className="space-y-2">
+            <h1 className="font-mono text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.05] tracking-tight">
+              <span className="text-white">BẢN ĐỒ</span><br />
+              <span className="text-white">CẢNH BÁO</span><br />
+              <span style={{
+                background: 'linear-gradient(90deg, #ff3b3b, #ff6b35)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                filter: 'drop-shadow(0 0 20px rgba(255,59,59,0.4))',
+              }}>TỘI PHẠM</span>
+            </h1>
+          </div>
 
-                    <p className="text-slate-600 text-base sm:text-lg  max-w-lg leading-relaxed">
-                        GuardM không chỉ là landing page demo, mà là bộ ứng dụng hoàn chỉnh gồm
-                        dashboard thống kê, bản đồ tội phạm, báo cáo người dân, danh sách truy nã
-                        và cảnh báo thời tiết được kết nối với dữ liệu thật.
-                    </p>
+          <p className="font-mono text-sm text-[#8899aa] leading-relaxed max-w-lg">
+            GuardM — hệ thống giám sát an ninh thời gian thực. Dashboard thống kê,
+            bản đồ tội phạm, báo cáo cộng đồng, danh sách truy nã và cảnh báo thời
+            tiết kết nối dữ liệu thật.
+          </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                        <Button
-                            asChild
-                            size="lg"
-                            className="text-base font-semibold shadow-[0_0_25px_rgba(220,38,38,0.4)]"
-                        >
-                            <a href={appUrl} className="flex items-center gap-2">
-                                Truy cập ứng dụng
-                                <ChevronRight className="w-5 h-5" />
-                            </a>
-                        </Button>
+          {/* Feature pills */}
+          <div className="flex flex-wrap gap-2">
+            {[
+              { icon: Activity, label: 'Real-time data', color: '#00d4ff' },
+              { icon: MapPin, label: 'Heatmap & markers', color: '#ffd700' },
+              { icon: Shield, label: 'Phân quyền bảo mật', color: '#00ff88' },
+            ].map(({ icon: Icon, label, color }) => (
+              <span key={label} className="flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1 rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.03)] text-[#8899aa]">
+                <Icon className="w-3 h-3" style={{ color }} />
+                {label}
+              </span>
+            ))}
+          </div>
 
-                    </div>
-                </div>
+          {/* CTA */}
+          <div className="flex items-center gap-4 pt-2">
+            <a href={appUrl}
+              className="group relative flex items-center gap-2.5 font-mono text-sm font-bold tracking-widest uppercase px-6 py-3 rounded border border-[rgba(255,59,59,0.5)] bg-[rgba(255,59,59,0.12)] text-[#ff3b3b] hover:bg-[rgba(255,59,59,0.2)] hover:text-white transition-all duration-200 overflow-hidden"
+              style={{ boxShadow: '0 0 24px rgba(255,59,59,0.2)' }}>
+              <span className="absolute inset-0 bg-gradient-to-r from-[rgba(255,59,59,0.1)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative">Truy cập ứng dụng</span>
+              <ChevronRight className="w-4 h-4 relative group-hover:translate-x-1 transition-transform" />
+            </a>
+          </div>
 
-                <div id="demo" className="relative hidden sm:block h-[400px] lg:h-[600px] w-full flex items-center justify-center perspective-1000">
-                    <CustomTechEarth />
-                </div>
+          {/* Status bar */}
+          <div className="flex items-center gap-4 pt-2">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse" />
+              <span className="font-mono text-[10px] text-[#00ff88]">SYSTEM ONLINE</span>
             </div>
-        </section>
-    );
-}
+            <span className="font-mono text-[10px] text-[#8899aa]/40">|</span>
+            <span className="font-mono text-[10px] text-[#8899aa]">Vietnam Coverage Active</span>
+          </div>
+        </div>
 
+        {/* Right: Globe */}
+        <div className="hidden sm:flex justify-center">
+          <TechGlobe />
+        </div>
+      </div>
 
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-24 pointer-events-none"
+        style={{ background: 'linear-gradient(to bottom, transparent, #060a14)' }} />
+    </section>
+  );
+};
