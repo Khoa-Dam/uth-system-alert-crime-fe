@@ -156,7 +156,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ locationData, onClose, onSubmit
     return (
         <Dialog open onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="p-0 gap-0 w-full max-w-lg overflow-hidden border border-[rgba(0,212,255,0.2)] bg-[rgba(8,12,24,0.98)]"
-                style={{ backdropFilter: 'blur(20px)', boxShadow: '0 0 40px rgba(0,212,255,0.15), 0 0 80px rgba(0,0,0,0.8)' }}>
+                style={{ backdropFilter: 'blur(20px)' }}>
 
                 {/* Scan-line overlay */}
                 <div className="absolute inset-0 pointer-events-none opacity-[0.025]"
@@ -411,8 +411,7 @@ const ReportForm: React.FC<ReportFormProps> = ({ locationData, onClose, onSubmit
                         </Button>
                     ) : (
                         <Button type="button" onClick={handleSubmit} disabled={isSubmitting}
-                            className="flex-1 font-mono text-xs font-bold h-10 bg-[rgba(255,59,59,0.15)] border border-[rgba(255,59,59,0.5)] text-[#ff3b3b] hover:bg-[rgba(255,59,59,0.25)] hover:text-white disabled:opacity-40"
-                            style={{ boxShadow: isSubmitting ? undefined : '0 0 16px rgba(255,59,59,0.2)' }}>
+                            className="flex-1 font-mono text-xs font-bold h-10 bg-[rgba(255,59,59,0.15)] border border-[rgba(255,59,59,0.5)] text-[#ff3b3b] hover:bg-[rgba(255,59,59,0.25)] hover:text-white disabled:opacity-40">
                             {isSubmitting
                                 ? <><Loader2 className="h-4 w-4 animate-spin mr-2" />{isEditMode ? 'ĐANG CẬP NHẬT...' : 'ĐANG GỬI...'}</>
                                 : <><Check className="h-4 w-4 mr-1" />{isEditMode ? 'CẬP NHẬT' : 'GỬI BÁO CÁO'}</>

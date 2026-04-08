@@ -30,7 +30,7 @@ export const SecuritySection: React.FC = () => (
 
         <h3 className="font-mono text-3xl font-bold text-white leading-tight">
           HẠ TẦNG ĐƯỢC GIA CỐ<br />
-          <span style={{ color: '#00ff88', textShadow: '0 0 20px rgba(0,255,136,0.3)' }}>CHUẨN DOANH NGHIỆP</span>
+          <span style={{ color: '#00ff88' }}>CHUẨN DOANH NGHIỆP</span>
         </h3>
 
         <p className="font-mono text-sm text-[#8899aa] leading-relaxed">
@@ -41,8 +41,7 @@ export const SecuritySection: React.FC = () => (
         <div className="space-y-3">
           {securityItems.map((item) => (
             <div key={item} className="flex items-start gap-3">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] mt-1.5 shrink-0"
-                style={{ boxShadow: '0 0 6px rgba(0,255,136,0.6)' }} />
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] mt-1.5 shrink-0" />
               <span className="font-mono text-xs text-[#8899aa] leading-relaxed">{item}</span>
             </div>
           ))}
@@ -50,8 +49,7 @@ export const SecuritySection: React.FC = () => (
       </div>
 
       {/* Right: Security info panel */}
-      <div className="rounded border border-[rgba(0,255,136,0.15)] bg-[rgba(12,17,32,0.8)] backdrop-blur-sm overflow-hidden"
-        style={{ boxShadow: '0 0 40px rgba(0,255,136,0.05)' }}>
+      <div className="rounded border border-[rgba(0,255,136,0.15)] bg-[rgba(12,17,32,0.8)] backdrop-blur-sm overflow-hidden">
         {/* Panel header */}
         <div className="flex items-center gap-3 px-5 py-4 border-b border-[rgba(0,255,136,0.1)]">
           <Server className="w-4 h-4 text-[#00ff88]" />

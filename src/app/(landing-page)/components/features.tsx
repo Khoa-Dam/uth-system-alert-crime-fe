@@ -39,7 +39,7 @@ export const FeaturesSection: React.FC = () => (
         </div>
         <h2 className="font-mono text-3xl md:text-4xl font-bold text-white leading-tight">
           CÔNG NGHỆ BẢO VỆ<br />
-          <span style={{ color: '#00d4ff', textShadow: '0 0 30px rgba(0,212,255,0.4)' }}>TIÊN TIẾN NHẤT</span>
+          <span style={{ color: '#00d4ff' }}>TIÊN TIẾN NHẤT</span>
         </h2>
         <p className="font-mono text-sm text-[#8899aa] max-w-xl mx-auto leading-relaxed">
           Kết hợp dữ liệu cộng đồng và hạ tầng thời gian thực để cảnh báo chính xác mọi lúc mọi nơi.

@@ -39,13 +39,11 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-2.5">
-            <div className="relative p-1.5 rounded bg-[rgba(255,59,59,0.15)] border border-[rgba(255,59,59,0.3)]"
-              style={{ boxShadow: '0 0 12px rgba(255,59,59,0.3)' }}>
+            <div className="relative p-1.5 rounded bg-[rgba(255,59,59,0.15)] border border-[rgba(255,59,59,0.3)]">
               <Logo className="w-5 h-5 text-[#ff3b3b]" />
-              <div className="absolute inset-0 rounded animate-pulse opacity-30" style={{ background: 'radial-gradient(circle, rgba(255,59,59,0.4), transparent)' }} />
             </div>
             <span className="font-mono font-bold text-lg tracking-wider">
-              GUARD<span className="text-[#ff3b3b]" style={{ textShadow: '0 0 10px rgba(255,59,59,0.6)' }}>M</span>
+              GUARD<span className="text-[#ff3b3b]">M</span>
             </span>
           </div>
 
@@ -63,8 +61,7 @@ export default function LandingPage() {
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
             <Link href={APP_URL + '/dashboard'}
-              className="flex items-center gap-2 font-mono text-xs font-bold tracking-widest uppercase px-4 py-2 rounded border border-[rgba(255,59,59,0.4)] bg-[rgba(255,59,59,0.1)] text-[#ff3b3b] hover:bg-[rgba(255,59,59,0.2)] hover:text-white transition-all duration-200"
-              style={{ boxShadow: '0 0 12px rgba(255,59,59,0.15)' }}>
+              className="flex items-center gap-2 font-mono text-xs font-bold tracking-widest uppercase px-4 py-2 rounded border border-[rgba(255,59,59,0.4)] bg-[rgba(255,59,59,0.1)] text-[#ff3b3b] hover:bg-[rgba(255,59,59,0.2)] hover:text-white transition-all duration-200">
               Mở App <ChevronRight className="w-3.5 h-3.5" />
             </Link>
           </div>

@@ -43,8 +43,7 @@ const TechGlobe = () => {
       <div className="absolute inset-[-8px] rounded-full border border-[rgba(0,212,255,0.15)]" />
 
       {/* Globe */}
-      <div className="relative w-full aspect-square rounded-full overflow-hidden border border-[rgba(0,212,255,0.25)]"
-        style={{ boxShadow: '0 0 60px rgba(0,212,255,0.15), inset 0 0 60px rgba(0,0,0,0.5)' }}>
+      <div className="relative w-full aspect-square rounded-full overflow-hidden border border-[rgba(0,212,255,0.25)]">
         {/* Dark ocean bg */}
         <div className="absolute inset-0 bg-[#0a1628]" />
 
@@ -140,7 +139,6 @@ export const HeroSection: React.FC<HeroProps> = ({ appUrl }) => {
                 background: 'linear-gradient(90deg, #ff3b3b, #ff6b35)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                filter: 'drop-shadow(0 0 20px rgba(255,59,59,0.4))',
               }}>TỘI PHẠM</span>
             </h1>
           </div>
@@ -168,8 +166,7 @@ export const HeroSection: React.FC<HeroProps> = ({ appUrl }) => {
           {/* CTA */}
           <div className="flex items-center gap-4 pt-2">
             <a href={appUrl}
-              className="group relative flex items-center gap-2.5 font-mono text-sm font-bold tracking-widest uppercase px-6 py-3 rounded border border-[rgba(255,59,59,0.5)] bg-[rgba(255,59,59,0.12)] text-[#ff3b3b] hover:bg-[rgba(255,59,59,0.2)] hover:text-white transition-all duration-200 overflow-hidden"
-              style={{ boxShadow: '0 0 24px rgba(255,59,59,0.2)' }}>
+              className="group relative flex items-center gap-2.5 font-mono text-sm font-bold tracking-widest uppercase px-6 py-3 rounded border border-[rgba(255,59,59,0.5)] bg-[rgba(255,59,59,0.12)] text-[#ff3b3b] hover:bg-[rgba(255,59,59,0.2)] hover:text-white transition-all duration-200 overflow-hidden">
               <span className="absolute inset-0 bg-gradient-to-r from-[rgba(255,59,59,0.1)] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <span className="relative">Truy cập ứng dụng</span>
               <ChevronRight className="w-4 h-4 relative group-hover:translate-x-1 transition-transform" />

@@ -95,10 +95,10 @@ export default function DashboardPage() {
   }, []);
 
   const summaryCards = useMemo(() => [
-    { title: 'TỔNG BÁO CÁO', value: statistics?.total, icon: FileWarning, color: '#00d4ff', glow: 'var(--glow-cyan)' },
-    { title: 'ĐANG HOẠT ĐỘNG', value: statistics?.activeAlerts, icon: Activity, color: '#ffd700', glow: '0 0 20px rgba(255,215,0,0.4)' },
-    { title: 'MỨC ĐỘ CAO', value: statistics?.highSeverity, icon: AlertTriangle, color: '#ff3b3b', glow: 'var(--glow-red)' },
-    { title: 'ĐỐI TƯỢNG TRUY NÃ', value: homeData?.statistics.totalWanted, icon: Users, color: '#00ff88', glow: 'var(--glow-green)' },
+    { title: 'TỔNG BÁO CÁO', value: statistics?.total, icon: FileWarning, color: '#00d4ff' },
+    { title: 'ĐANG HOẠT ĐỘNG', value: statistics?.activeAlerts, icon: Activity, color: '#ffd700' },
+    { title: 'MỨC ĐỘ CAO', value: statistics?.highSeverity, icon: AlertTriangle, color: '#ff3b3b' },
+    { title: 'ĐỐI TƯỢNG TRUY NÃ', value: homeData?.statistics.totalWanted, icon: Users, color: '#00ff88' },
   ], [statistics, homeData]);
 
   const crimeTypeData = useMemo(() =>
@@ -180,7 +180,6 @@ export default function DashboardPage() {
             <div
               key={stat.title}
               className="stat-card glass-card group relative overflow-hidden cursor-default"
-              style={{ '--card-glow': stat.glow } as React.CSSProperties}
             >
               {/* Corner accent */}
               <div className="absolute top-0 right-0 w-16 h-16 opacity-5"
@@ -257,7 +256,7 @@ export default function DashboardPage() {
                 <div className="mt-3 flex flex-wrap gap-2">
                   {crimeTypeData.map((item, i) => (
                     <span key={item.label} className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
-                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: typeColors[i % typeColors.length], boxShadow: `0 0 4px ${typeColors[i % typeColors.length]}` }} />
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: typeColors[i % typeColors.length] }} />
                       {item.label}
                     </span>
                   ))}

@@ -122,11 +122,11 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                         "absolute left-0 top-1/2 -translate-y-1/2 w-0.5 rounded-r transition-all duration-300",
                                         isActive ? "h-4/5 opacity-100" : "h-0 opacity-0 group-hover:h-1/2 group-hover:opacity-50"
                                     )}
-                                        style={{ backgroundColor: item.color, boxShadow: isActive ? `0 0 8px ${item.color}` : undefined }}
+                                        style={{ backgroundColor: item.color }}
                                     />
 
                                     <Icon className="h-4 w-4 shrink-0 transition-all duration-200"
-                                        style={{ color: isActive ? item.color : undefined, filter: isActive ? `drop-shadow(0 0 6px ${item.color})` : undefined }} />
+                                        style={{ color: isActive ? item.color : undefined }} />
 
                                     <span className="flex-1 truncate tracking-wide">{item.label}</span>
 
@@ -174,7 +174,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                                 <a key={c.number} href={`tel:${c.number}`}
                                     className="group flex flex-col items-center gap-1 rounded border border-[rgba(255,59,59,0.2)] bg-[rgba(255,59,59,0.04)] p-2 text-center hover:border-[rgba(255,59,59,0.5)] hover:bg-[rgba(255,59,59,0.08)] transition-all duration-200">
                                     <Phone className="h-3.5 w-3.5 text-[#ff3b3b]" />
-                                    <span className="font-mono text-sm font-bold text-[#ff3b3b]" style={{ textShadow: "0 0 8px rgba(255,59,59,0.5)" }}>{c.number}</span>
+                                    <span className="font-mono text-sm font-bold text-[#ff3b3b]">{c.number}</span>
                                     <span className="font-mono text-[9px] text-[#8899aa]">{c.label}</span>
                                 </a>
                             ))}
