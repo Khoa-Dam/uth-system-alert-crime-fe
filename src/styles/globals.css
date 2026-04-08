@@ -416,3 +416,46 @@
 .leaflet-popup-tip {
   background: rgba(12, 17, 32, 0.95) !important;
 }
+
+/* ─── MAP COMPONENT DARK OVERRIDES ─────────────────────────────────────── */
+
+/* Map loading overlay */
+.map-loading-overlay {
+  background: rgba(6, 10, 20, 0.92) !important;
+  backdrop-filter: blur(8px);
+}
+.map-loading-overlay span {
+  color: rgba(0, 212, 255, 0.6) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.1em !important;
+}
+
+/* MapLegend — override Card's bg-white/95 */
+.map-legend {
+  background: rgba(8, 12, 24, 0.92) !important;
+  border: 1px solid rgba(0, 212, 255, 0.18) !important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.08) !important;
+}
+.map-legend * {
+  color: rgba(180, 210, 230, 0.85) !important;
+}
+.map-legend h3 {
+  color: rgba(0, 212, 255, 0.8) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+}
+.map-legend .legend-divider {
+  border-color: rgba(0, 212, 255, 0.1) !important;
+}
+
+/* DangerAlert — dark red variant */
+.danger-alert-dark {
+  background: rgba(30, 8, 8, 0.92) !important;
+  border-color: rgba(255, 59, 59, 0.4) !important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 0 20px rgba(255, 59, 59, 0.15) !important;
+}

@@ -385,14 +385,14 @@ const CrimeMapContent = () => {
     const selectedReport = reports.find((r) => r.id === selectedReportId);
 
     return (
-        <div className="relative w-full h-[65vh] md:h-[600px] rounded-xl overflow-hidden shadow-xl border border-gray-200 bg-white font-sans">
+        <div className="relative w-full h-[65vh] md:h-[600px] rounded-xl overflow-hidden border border-[rgba(0,212,255,0.15)] bg-[#060a14]">
             {alertMessage && (
                 <DangerAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
             )}
             {(!isLeafletLoaded || loading) && (
-                <div className="absolute inset-0 bg-white/90 z-2000 flex flex-col items-center justify-center">
-                    <div className="w-10 h-10 border-4 border-blue-600 border-top-transparent rounded-full animate-spin mb-3" />
-                    <span className="text-sm font-semibold text-gray-600">Đang tải bản đồ...</span>
+                <div className="absolute inset-0 bg-[rgba(6,10,20,0.92)] backdrop-blur-sm z-[2000] flex flex-col items-center justify-center">
+                    <div className="w-10 h-10 border-2 border-[rgba(0,212,255,0.2)] border-t-[#00d4ff] rounded-full animate-spin mb-3" />
+                    <span className="font-mono text-xs text-[#00d4ff]/60 tracking-widest uppercase">Đang tải bản đồ...</span>
                 </div>
             )}
 
@@ -449,7 +449,7 @@ const CrimeMapContent = () => {
                 )}
             </div>
 
-            <div ref={mapContainerRef} className="w-full h-full z-0 bg-slate-50" />
+            <div ref={mapContainerRef} className="w-full h-full z-0 bg-[#060a14]" />
 
             {/* Map Legend - Chú thích các icon */}
             {!isReportingMode && <MapLegend />}
@@ -507,7 +507,7 @@ const CrimeMapContent = () => {
                 variant="outline"
                 size="icon"
                 onClick={handleLocationButtonClick}
-                className="absolute bottom-6 right-12 z-44 rounded-full shadow-lg pointer-events-auto h-12 w-12 group bg-white hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                className="absolute bottom-6 right-12 z-[44] rounded-full shadow-lg pointer-events-auto h-12 w-12 group bg-[rgba(0,212,255,0.1)] border border-[rgba(0,212,255,0.3)] hover:bg-[rgba(0,212,255,0.2)] transition-colors"
                 title="Vị trí của tôi"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
@@ -549,9 +549,9 @@ const CrimeMapContent = () => {
 const CrimeMap = () => {
     return (
         <Suspense fallback={
-            <div className="relative w-full h-[65vh] md:h-[600px] rounded-xl overflow-hidden shadow-xl border border-gray-200 bg-white flex flex-col items-center justify-center">
-                <Loader2 className="w-10 h-10 text-blue-600 animate-spin mb-3" />
-                <span className="text-sm font-semibold text-gray-600">Đang khởi tạo bản đồ...</span>
+            <div className="relative w-full h-[65vh] md:h-[600px] rounded-xl overflow-hidden border border-[rgba(0,212,255,0.15)] bg-[#060a14] flex flex-col items-center justify-center">
+                <div className="w-10 h-10 border-2 border-[rgba(0,212,255,0.2)] border-t-[#00d4ff] rounded-full animate-spin mb-3" />
+                <span className="font-mono text-xs text-[#00d4ff]/60 tracking-widest uppercase">Đang khởi tạo bản đồ...</span>
             </div>
         }>
             <CrimeMapContent />
