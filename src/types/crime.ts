@@ -16,6 +16,7 @@ export enum CrimeType {
 export interface CrimeReport {
     id: string;
     reporterId?: string;
+    reporterAvatar?: string;
     title?: string;
     description?: string;
     type?: string;

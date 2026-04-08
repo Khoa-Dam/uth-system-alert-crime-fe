@@ -106,6 +106,9 @@ export const authConfig = {
                         refreshToken: data.refreshToken,
                         userId: data.userId,
                         role: data.role,
+                        name: data.name ?? null,
+                        avatar: data.avatar ?? null,
+                        isGoogleUser: true,
                         accessTokenExpires: Date.now() + (3600 - 300) * 1000,
                     }
                 }
@@ -116,8 +119,9 @@ export const authConfig = {
                     refreshToken: user.refreshToken,
                     userId: user.userId,
                     role: user.role,
-                    // Set token expiry time (JWT_EXPIRES_IN=1h = 3600 seconds)
-                    // Subtract 5 minutes buffer to refresh before actual expiry
+                    name: user.name ?? null,
+                    avatar: user.avatar ?? null,
+                    isGoogleUser: false,
                     accessTokenExpires: Date.now() + (3600 - 300) * 1000, // 55 minutes
                 }
             }
@@ -145,6 +149,9 @@ export const authConfig = {
                     ...session.user,
                     id: token.userId as string,
                     role: token.role as string | null,
+                    name: token.name as string | null,
+                    avatar: token.avatar as string | null,
+                    isGoogleUser: token.isGoogleUser as boolean,
                 }
                 session.accessToken = token.accessToken as string
                 session.refreshToken = token.refreshToken as string
@@ -202,8 +209,9 @@ export const authConfig = {
                         return {
                             id: data.user?.id || data.userId || '',
                             email: credentials.email as string,
-                            name: data.user?.name || '',
-                            role: data.user?.role || data.role || null, // Lấy role từ BE
+                            name: data.name || data.user?.name || '',
+                            role: data.user?.role || data.role || null,
+                            avatar: data.avatar || null,
                             accessToken: data.accessToken,
                             refreshToken: data.refreshToken,
                             userId: data.user?.id || data.userId || '',

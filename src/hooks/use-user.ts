@@ -20,17 +20,12 @@ export function useUser() {
     const isAuthenticated = status === 'authenticated'
     const isLoading = status === 'loading'
 
-    // Format user name - fallback to email or default
     const userName = user?.name || user?.email || "Người dùng"
-
-    // Format user role - fallback to default role text
     const userRole = user?.role || "Cục cảnh sát truy nã"
-
-    // User ID
     const userId = user?.id || null
-
-    // User email
     const userEmail = user?.email || null
+    const userAvatar = user?.avatar || null
+    const isGoogleUser = user?.isGoogleUser ?? false
 
     return {
         user,
@@ -38,6 +33,8 @@ export function useUser() {
         userRole,
         userId,
         userEmail,
+        userAvatar,
+        isGoogleUser,
         isAuthenticated,
         isLoading,
         session,

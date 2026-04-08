@@ -1,352 +1,336 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import type { LucideIcon } from 'lucide-react';
 import dynamic from 'next/dynamic';
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Spinner } from '@/components/ui/spinner';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import {
-    Users,
-    FileWarning,
-    AlertTriangle,
-    Shield,
-    Eye,
-    Bell,
-    Globe,
-    ShieldCheck,
-    MapPin,
+  FileWarning, AlertTriangle, ShieldCheck, Users, Shield,
+  Eye, MapPin, Activity, Zap, Globe, ChevronRight,
 } from 'lucide-react';
-
 import { useHomeData } from '@/hooks/use-home-data';
 import { useStatistics, useHeatmap } from '@/hooks/use-statistics';
+import { Spinner } from '@/components/ui/spinner';
 
-// Lazy load charts
+// Lazy-load heavy components
+const GlobeViz = dynamic(() => import('./components/GlobeViz'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="w-12 h-12 rounded-full border-2 border-[#00d4ff]/30 border-t-[#00d4ff] animate-spin" />
+    </div>
+  ),
+});
+
 const CrimeTypePieChart = dynamic(() => import('./components/CrimeTypePieChart'), {
-    ssr: false,
-    loading: () => <div className="flex h-full items-center justify-center"><Spinner className="h-6 w-6 text-muted-foreground" /></div>
+  ssr: false,
+  loading: () => <div className="flex h-full items-center justify-center"><Spinner className="h-6 w-6 text-muted-foreground" /></div>,
 });
 
 const DistrictBarChart = dynamic(() => import('./components/DistrictBarChart'), {
-    ssr: false,
-    loading: () => <div className="flex h-full items-center justify-center"><Spinner className="h-6 w-6 text-muted-foreground" /></div>
+  ssr: false,
+  loading: () => <div className="flex h-full items-center justify-center"><Spinner className="h-6 w-6 text-muted-foreground" /></div>,
 });
 
-const systemNotices = [
-    {
-        id: 1,
-        title: 'Không có cập nhật nào gần đây',
-        content: '',
-        type: 'info',
-    },
-];
-
-const typeColors = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#3b82f6', '#a855f7', '#ec4899', '#14b8a6'];
+gsap.registerPlugin(ScrollTrigger);
 
 const crimeTypeLabels: Record<string, string> = {
-    truy_na: 'Truy nã',
-    nghi_pham: 'Nghi phạm',
-    dang_ngo: 'Đáng ngờ',
-    de_doa: 'Đe dọa',
-    giet_nguoi: 'Giết người',
-    bat_coc: 'Bắt cóc',
-    cuop_giat: 'Cướp giật',
-    trom_cap: 'Trộm cắp',
+  truy_na: 'Truy nã', nghi_pham: 'Nghi phạm', dang_ngo: 'Đáng ngờ',
+  de_doa: 'Đe dọa', giet_nguoi: 'Giết người', bat_coc: 'Bắt cóc',
+  cuop_giat: 'Cướp giật', trom_cap: 'Trộm cắp',
 };
+const typeColors = ['#ff3b3b', '#ff6b35', '#ffd700', '#00ff88', '#00d4ff', '#a855f7', '#ec4899', '#14b8a6'];
 
-const severityBadgeClass: Record<'low' | 'medium' | 'high', string> = {
-    high: 'bg-red-100 text-red-700',
-    medium: 'bg-amber-100 text-amber-700',
-    low: 'bg-emerald-100 text-emerald-700',
-};
+const severityColor = (s: string) =>
+  s === 'high' ? 'text-[#ff3b3b] border-[#ff3b3b]/30 bg-[#ff3b3b]/10' :
+    s === 'medium' ? 'text-[#ffd700] border-[#ffd700]/30 bg-[#ffd700]/10' :
+      'text-[#00ff88] border-[#00ff88]/30 bg-[#00ff88]/10';
 
-const formatNumber = (value?: number) => {
-    if (value === undefined || value === null) return '—';
-    return value.toLocaleString('vi-VN');
-};
-
-const formatDate = (iso?: string) => {
-    if (!iso) return '—';
-    return new Date(iso).toLocaleDateString('vi-VN');
-};
-
-interface SummaryCard {
-    title: string;
-    value?: number;
-    description: string;
-    icon: LucideIcon;
-}
+const severityLabel = (s: string) => s === 'high' ? 'NGUY HIỂM' : s === 'medium' ? 'CẢNH BÁO' : 'AN TOÀN';
 
 export default function DashboardPage() {
-    // Use React Query hooks for caching
-    const { data: homeData, isLoading: homeLoading, error: homeError } = useHomeData();
-    const { data: statistics, isLoading: statsLoading, error: statsError } = useStatistics();
-    const { data: heatmapData = [], isLoading: heatmapLoading, error: heatmapError } = useHeatmap();
+  const { data: homeData, isLoading: homeLoading } = useHomeData();
+  const { data: statistics, isLoading: statsLoading } = useStatistics();
+  const { data: heatmapData = [], isLoading: heatmapLoading } = useHeatmap();
 
-    const loading = homeLoading || statsLoading || heatmapLoading;
-    const error = homeError?.message || statsError?.message || heatmapError?.message || null;
+  const loading = homeLoading || statsLoading || heatmapLoading;
+  const cardsRef = useRef<HTMLDivElement>(null);
+  const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headingRefs = useRef<(HTMLHeadingElement | null)[]>([]);
 
-    const summaryCards = useMemo<SummaryCard[]>(
-        () => [
-            {
-                title: 'Tổng báo cáo',
-                value: statistics?.total,
-                description: 'Báo cáo đã ghi nhận',
-                icon: FileWarning,
-            },
-            {
-                title: 'Báo cáo đang hoạt động',
-                value: statistics?.activeAlerts,
-                description: 'Status = 0',
-                icon: AlertTriangle,
-            },
-            {
-                title: 'Báo cáo mức độ cao',
-                value: statistics?.highSeverity,
-                description: 'Severity ≥ 4',
-                icon: ShieldCheck,
-            },
-            {
-                title: 'Đối tượng truy nã',
-                value: homeData?.statistics.totalWanted,
-                description: 'Từ nguồn dữ liệu thực',
-                icon: Users,
-            },
-        ],
-        [statistics, homeData]
+  useEffect(() => {
+    if (!cardsRef.current) return;
+    const cards = cardsRef.current.querySelectorAll('.stat-card');
+    gsap.fromTo(cards,
+      { y: 40, opacity: 0 },
+      {
+        y: 0, opacity: 1, duration: 0.6, stagger: 0.1, ease: 'power3.out',
+        scrollTrigger: { trigger: cardsRef.current, start: 'top 85%', once: true },
+      }
     );
+  }, []);
 
-    const crimeTypeData = useMemo(
-        () =>
-            (statistics?.byType ?? []).map((item) => ({
-                label: crimeTypeLabels[item.type] ?? item.type,
-                count: item.count,
-            })),
-        [statistics]
-    );
+  useEffect(() => {
+    sectionRefs.current.forEach((el) => {
+      if (!el) return;
+      gsap.fromTo(el,
+        { y: 30, opacity: 0 },
+        {
+          y: 0, opacity: 1, duration: 0.7, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 80%', once: true },
+        }
+      );
+    });
+    headingRefs.current.forEach((el) => {
+      if (!el) return;
+      gsap.fromTo(el,
+        { clipPath: 'inset(0 100% 0 0)', opacity: 0 },
+        {
+          clipPath: 'inset(0 0% 0 0)', opacity: 1, duration: 0.8, ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+        }
+      );
+    });
+  }, []);
 
-    const topDistricts = useMemo(
-        () => (statistics?.byDistrict ?? []).slice(0, 6),
-        [statistics]
-    );
+  const summaryCards = useMemo(() => [
+    { title: 'TỔNG BÁO CÁO', value: statistics?.total, icon: FileWarning, color: '#00d4ff', glow: 'var(--glow-cyan)' },
+    { title: 'ĐANG HOẠT ĐỘNG', value: statistics?.activeAlerts, icon: Activity, color: '#ffd700', glow: '0 0 20px rgba(255,215,0,0.4)' },
+    { title: 'MỨC ĐỘ CAO', value: statistics?.highSeverity, icon: AlertTriangle, color: '#ff3b3b', glow: 'var(--glow-red)' },
+    { title: 'ĐỐI TƯỢNG TRUY NÃ', value: homeData?.statistics.totalWanted, icon: Users, color: '#00ff88', glow: 'var(--glow-green)' },
+  ], [statistics, homeData]);
 
-    const heatmapHighlights = useMemo(() => heatmapData.slice(0, 6), [heatmapData]);
-    const recentWanted = homeData?.recentWantedCriminals ?? [];
-    const displayedWanted = recentWanted.slice(0, 6);
+  const crimeTypeData = useMemo(() =>
+    (statistics?.byType ?? []).map((item) => ({ label: crimeTypeLabels[item.type] ?? item.type, count: item.count })),
+    [statistics]
+  );
+  const topDistricts = useMemo(() => (statistics?.byDistrict ?? []).slice(0, 6), [statistics]);
+  const heatmapHighlights = useMemo(() => heatmapData.slice(0, 6), [heatmapData]);
+  const displayedWanted = (homeData?.recentWantedCriminals ?? []).slice(0, 6);
 
-    return (
-        <main className="flex-1 p-4 md:p-6">
-            <div className="mx-auto max-w-7xl space-y-4 md:space-y-6">
-                {error && (
-                    <Alert variant="destructive">
-                        <AlertTitle>Lỗi</AlertTitle>
-                        <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                )}
+  return (
+    <main className="flex-1 overflow-y-auto">
+      {/* ── HERO: 3D Globe + HUD ─────────────────────────────────────────── */}
+      <section className="relative h-[520px] md:h-[600px] overflow-hidden">
+        {/* Scan-line overlay */}
+        <div className="scanlines absolute inset-0 pointer-events-none z-10" />
+        {/* Grid background */}
+        <div className="grid-bg absolute inset-0 pointer-events-none z-0" />
 
-                <div className="grid gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-                    {summaryCards.map((stat) => (
-                        <Card key={stat.title}>
-                            <CardHeader className="flex flex-row items-center justify-between pb-2">
-                                <CardTitle className="text-sm font-medium text-muted-foreground">{stat.title}</CardTitle>
-                                <stat.icon className="h-4 w-4 text-muted-foreground" />
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-xl md:text-2xl font-bold min-h-6 flex items-center">
-                                    {loading ? <Spinner className="h-5 w-5 text-muted-foreground" /> : formatNumber(stat.value)}
-                                </div>
-                                <p className="text-xs text-muted-foreground">{stat.description}</p>
-                            </CardContent>
-                        </Card>
-                    ))}
-                </div>
+        {/* Globe */}
+        <div className="absolute inset-0 z-0">
+          <GlobeViz />
+        </div>
 
-                <Card>
-                    <CardHeader className="pb-3 ">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                                    <Eye className="h-4 w-4 md:h-5 md:w-5" />
-                                    Đối tượng truy nã mới nhất
-                                </CardTitle>
-                                <CardDescription className="text-xs md:text-sm"></CardDescription>
+        {/* Gradient vignette bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
 
-                            </div>
-                            <Link href="/wanted" className="text-sm text-primary hover:underline">
-                                Xem tất cả
-                            </Link>
-                        </div>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-3 md:gap-4 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-                            {loading ? (
-                                <div className="col-span-full flex justify-center py-8">
-                                    <Spinner className="h-8 w-8 text-muted-foreground" />
-                                </div>
-                            ) : (
-                                displayedWanted.map((person) => (
-                                    <div
-                                        key={person.id}
-                                        className="flex gap-3 rounded-lg border border-border p-3 md:p-4 transition-colors hover:bg-amber-50"
-                                    >
-                                        <div className="h-14 w-14 md:h-16 md:w-16 shrink-0 rounded-lg bg-muted flex items-center justify-center">
-                                            <Users className="h-6 w-6 md:h-8 md:w-8 text-muted-foreground" />
-                                        </div>
-                                        <div className="flex-1 min-w-0 space-y-1">
-                                            <div className="flex items-center justify-between gap-2">
-                                                <p className="font-semibold text-sm ">{person.name}</p>
-                                                <Badge variant="secondary" className="text-xs shrink-0">
-                                                    Sinh {person.birthYear}
-                                                </Badge>
-                                            </div>
-                                            <p className="text-xs text-muted-foreground ">Tội danh: {person.crime}</p>
-                                            <p className="text-xs text-muted-foreground ">
-                                                Đơn vị: {person.issuingUnit ?? 'Đang cập nhật'}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground ">
-                                                <MapPin className="inline h-3 w-3 mr-1" />
-                                                {person.address ?? 'Chưa rõ'}
-                                            </p>
-                                            <p className="text-[11px] text-muted-foreground">Cập nhật: {formatDate(person.createdAt)}</p>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
+        {/* HUD – top-left title */}
+        <div className="absolute top-6 left-6 z-20 hud-border pl-4 py-2 pr-6">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#ff3b3b] animate-pulse" />
+            <span className="font-mono text-[10px] text-[#00d4ff]/60 tracking-[0.3em] uppercase">GuardM System v2.0</span>
+          </div>
+          <h1 className="font-mono text-xl md:text-2xl font-bold text-white mt-1">
+            CRIME SURVEILLANCE
+          </h1>
+          <p className="font-mono text-[10px] text-[#00d4ff]/50 tracking-widest">REAL-TIME MONITORING — VIETNAM</p>
+        </div>
 
-                <div className="grid gap-4 md:gap-6 grid-cols-1">
-                    <Card>
-                        <CardHeader className="pb-3 ">
-                            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                                <Shield className="h-4 w-4 md:h-5 md:w-5" />
-                                Thống kê báo cáo
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid gap-6 lg:grid-cols-2">
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground mb-2">Theo loại tội phạm</p>
-                                <div className="h-64">
-                                    <CrimeTypePieChart data={crimeTypeData} colors={typeColors} />
-                                </div>
-                                {crimeTypeData.length ? (
-                                    <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
-                                        {crimeTypeData.map((item, index) => (
-                                            <span key={item.label} className="flex items-center gap-1">
-                                                <span
-                                                    className="h-2.5 w-2.5 rounded-full"
-                                                    style={{ backgroundColor: typeColors[index % typeColors.length] }}
-                                                />
-                                                {item.label}
-                                            </span>
-                                        ))}
-                                    </div>
-                                ) : null}
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground mb-2">Top quận/huyện</p>
-                                <div className="h-64">
-                                    <DistrictBarChart data={topDistricts} />
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
-                    <Card>
-                        <CardHeader className="pb-3 ">
-                            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                                <Globe className="h-4 w-4 md:h-5 md:w-5" />
-                                Điểm nóng (Heatmap)
-                            </CardTitle>
-                            <CardDescription className="text-xs md:text-sm">
-                                Chú thích màu:
-                            </CardDescription>
-                            <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
-                                <span className="flex items-center gap-1">
-                                    <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
-                                    Nguy hiểm (đỏ)
-                                </span>
-                                <span className="flex items-center gap-1">
-                                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                                    Cảnh báo (vàng)
-                                </span>
-                                <span className="flex items-center gap-1">
-                                    <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" />
-                                    Ổn định (xanh)
-                                </span>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            {heatmapHighlights.length ? (
-                                <div className="space-y-3 md:space-y-4">
-                                    {heatmapHighlights.map((point, index) => (
-                                        <div
-                                            key={`${point.district}-${point.crimeType}-${index}`}
-                                            className="flex items-start justify-between gap-3 rounded-lg border border-border p-3"
-                                        >
-                                            <div className="space-y-1">
-                                                <p className="font-medium text-sm">
-                                                    {point.district || point.province || 'Không xác định'}
-                                                </p>
-                                                <p className="text-xs text-muted-foreground">
-                                                    {crimeTypeLabels[point.crimeType] ?? point.crimeType} ·{' '}
-                                                    {point.count.toLocaleString('vi-VN')} báo cáo
-                                                </p>
-                                            </div>
-                                            <Badge className={`${severityBadgeClass[point.severity]} text-xs`}>
-                                                {point.severity === 'high' ? 'Nguy hiểm' : point.severity === 'medium' ? 'Cảnh báo' : 'Ổn định'}
-                                            </Badge>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-sm text-muted-foreground">Chưa có dữ liệu heatmap.</p>
-                            )}
-                        </CardContent>
-                    </Card>
-
-                    <Card>
-                        <CardHeader className="pb-3 ">
-                            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
-                                <Bell className="h-4 w-4 md:h-5 md:w-5" />
-                                Thông báo hệ thống
-                            </CardTitle>
-                            <CardDescription className="text-xs md:text-sm">Các thông báo quan trọng</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <div className="space-y-3 md:space-y-4">
-                                {systemNotices.map((notice) => (
-                                    <div
-                                        key={notice.id}
-                                        className={`rounded-lg border p-3 md:p-4 ${notice.type === 'warning'
-                                            ? 'border-amber-500/50 bg-amber-50'
-                                            : 'border-blue-500/50 '
-                                            }`}
-                                    >
-                                        <div className="flex items-start gap-2">
-                                            {notice.type === 'warning' ? (
-                                                <AlertTriangle className="h-4 w-4 text-amber-500 mt-0.5 shrink-0" />
-                                            ) : (
-                                                <Bell className="h-4 w-4 text-blue-500 mt-0.5 shrink-0" />
-                                            )}
-                                            <div className="space-y-1 min-w-0">
-                                                <p className="font-medium text-sm">{notice.title}</p>
-                                                <p className="text-xs md:text-sm text-muted-foreground">{notice.content}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </CardContent>
-                    </Card>
-                </div>
+        {/* HUD – top-right quick stats */}
+        <div className="absolute top-6 right-6 z-20 flex flex-col gap-2 items-end">
+          {[
+            { label: 'TOTAL REPORTS', val: statistics?.total, color: '#00d4ff' },
+            { label: 'HIGH SEVERITY', val: statistics?.highSeverity, color: '#ff3b3b' },
+            { label: 'WANTED', val: homeData?.statistics?.totalWanted, color: '#00ff88' },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-3 hud-border px-3 py-1.5 text-right">
+              <span className="font-mono text-[9px] text-[#00d4ff]/50 tracking-widest">{item.label}</span>
+              <span className="font-mono text-sm font-bold" style={{ color: item.color, textShadow: `0 0 10px ${item.color}80` }}>
+                {loading ? '—' : (item.val ?? 0).toLocaleString('vi-VN')}
+              </span>
             </div>
-        </main>
-    );
+          ))}
+        </div>
+
+        {/* HUD – bottom status bar */}
+        <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center">
+          <div className="flex items-center gap-6 hud-border px-6 py-2">
+            <span className="flex items-center gap-2 font-mono text-[10px] text-[#00ff88]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse" />
+              SYSTEM ONLINE
+            </span>
+            <span className="font-mono text-[10px] text-[#00d4ff]/40">|</span>
+            <span className="font-mono text-[10px] text-[#00d4ff]/60">
+              {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase()}
+            </span>
+            <span className="font-mono text-[10px] text-[#00d4ff]/40">|</span>
+            <Link href="/map" className="flex items-center gap-1 font-mono text-[10px] text-[#00d4ff] hover:text-white transition-colors">
+              <MapPin className="w-3 h-3" /> VIEW MAP <ChevronRight className="w-3 h-3" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <div className="mx-auto max-w-7xl space-y-8 px-4 md:px-6 py-8">
+        {/* ── STAT CARDS ───────────────────────────────────────────────────── */}
+        <div ref={cardsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+          {summaryCards.map((stat) => (
+            <div
+              key={stat.title}
+              className="stat-card glass-card group relative overflow-hidden cursor-default"
+              style={{ '--card-glow': stat.glow } as React.CSSProperties}
+            >
+              {/* Corner accent */}
+              <div className="absolute top-0 right-0 w-16 h-16 opacity-5"
+                style={{ background: `radial-gradient(circle at top right, ${stat.color}, transparent)` }} />
+
+              <div className="flex items-start justify-between mb-3">
+                <span className="font-mono text-[9px] tracking-[0.2em] text-muted-foreground uppercase">{stat.title}</span>
+                <stat.icon className="h-3.5 w-3.5 shrink-0" style={{ color: stat.color }} />
+              </div>
+              <div className="font-mono text-2xl md:text-3xl font-bold" style={{ color: stat.color, textShadow: `0 0 20px ${stat.color}60` }}>
+                {loading ? <Spinner className="h-6 w-6" /> : (stat.value ?? 0).toLocaleString('vi-VN')}
+              </div>
+              {/* Bottom glow line */}
+              <div className="absolute bottom-0 left-0 right-0 h-px opacity-40 group-hover:opacity-80 transition-opacity"
+                style={{ background: `linear-gradient(90deg, transparent, ${stat.color}, transparent)` }} />
+            </div>
+          ))}
+        </div>
+
+        {/* ── WANTED CRIMINALS ─────────────────────────────────────────────── */}
+        <div ref={(el) => { sectionRefs.current[0] = el; }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 ref={(el) => { headingRefs.current[0] = el; }} className="flex items-center gap-2 font-mono text-sm font-bold text-[#ff3b3b] uppercase tracking-widest">
+              <Eye className="h-4 w-4" />
+              <span className="border-l-2 border-[#ff3b3b] pl-3">ĐỐI TƯỢNG TRUY NÃ MỚI NHẤT</span>
+            </h2>
+            <Link href="/wanted" className="flex items-center gap-1 font-mono text-[10px] text-[#00d4ff] hover:text-white transition-colors">
+              XEM TẤT CẢ <ChevronRight className="h-3 w-3" />
+            </Link>
+          </div>
+          <div className="grid gap-3 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+            {loading ? (
+              <div className="col-span-full flex justify-center py-8">
+                <Spinner className="h-8 w-8" />
+              </div>
+            ) : displayedWanted.map((person) => (
+              <div key={person.id} className="glass-card group flex gap-3 hover:border-[#ff3b3b]/40 transition-all duration-300">
+                <div className="h-12 w-12 shrink-0 rounded bg-[#ff3b3b]/10 border border-[#ff3b3b]/20 flex items-center justify-center">
+                  <Users className="h-6 w-6 text-[#ff3b3b]/60" />
+                </div>
+                <div className="flex-1 min-w-0 space-y-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-mono text-sm font-bold text-white truncate">{person.name}</p>
+                    <span className="font-mono text-[9px] text-[#ff3b3b]/60 shrink-0">{person.birthYear}</span>
+                  </div>
+                  <p className="font-mono text-[10px] text-[#ffd700]/70 truncate">{person.crime}</p>
+                  <p className="flex items-center gap-1 font-mono text-[10px] text-muted-foreground truncate">
+                    <MapPin className="h-2.5 w-2.5 shrink-0" />
+                    {person.address ?? 'Chưa rõ'}
+                  </p>
+                </div>
+                {/* Right accent line */}
+                <div className="absolute left-0 top-0 bottom-0 w-px bg-[#ff3b3b]/0 group-hover:bg-[#ff3b3b]/60 transition-all duration-300 rounded-l" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── CHARTS ───────────────────────────────────────────────────────── */}
+        <div ref={(el) => { sectionRefs.current[1] = el; }} className="glass-card p-0 overflow-hidden">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50">
+            <Shield className="h-4 w-4 text-[#00d4ff]" />
+            <h2 ref={(el) => { headingRefs.current[1] = el; }} className="font-mono text-sm font-bold text-[#00d4ff] uppercase tracking-widest">
+              THỐNG KÊ BÁO CÁO
+            </h2>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-2 p-5">
+            <div>
+              <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-3">THEO LOẠI TỘI PHẠM</p>
+              <div className="h-64">
+                <CrimeTypePieChart data={crimeTypeData} colors={typeColors} />
+              </div>
+              {crimeTypeData.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {crimeTypeData.map((item, i) => (
+                    <span key={item.label} className="flex items-center gap-1 font-mono text-[9px] text-muted-foreground">
+                      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: typeColors[i % typeColors.length], boxShadow: `0 0 4px ${typeColors[i % typeColors.length]}` }} />
+                      {item.label}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div>
+              <p className="font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-3">TOP QUẬN/HUYỆN</p>
+              <div className="h-64">
+                <DistrictBarChart data={topDistricts} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── HEATMAP + ALERTS ─────────────────────────────────────────────── */}
+        <div className="grid gap-4 md:gap-6 grid-cols-1 lg:grid-cols-2">
+          <div ref={(el) => { sectionRefs.current[2] = el; }} className="glass-card p-0 overflow-hidden">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50">
+              <Globe className="h-4 w-4 text-[#ffd700]" />
+              <h2 className="font-mono text-sm font-bold text-[#ffd700] uppercase tracking-widest">ĐIỂM NÓNG</h2>
+            </div>
+            <div className="p-4 space-y-2">
+              {heatmapLoading ? (
+                <div className="flex justify-center py-6"><Spinner className="h-6 w-6" /></div>
+              ) : heatmapHighlights.length ? heatmapHighlights.map((point, i) => (
+                <div key={`${point.district}-${i}`} className="flex items-center justify-between gap-3 rounded px-3 py-2.5 border border-border/40 hover:border-[#00d4ff]/30 transition-colors group">
+                  <div className="space-y-0.5 min-w-0">
+                    <p className="font-mono text-xs font-semibold text-white truncate">{point.district || point.province || 'N/A'}</p>
+                    <p className="font-mono text-[10px] text-muted-foreground truncate">
+                      {crimeTypeLabels[point.crimeType] ?? point.crimeType} · {point.count.toLocaleString('vi-VN')} báo cáo
+                    </p>
+                  </div>
+                  <span className={`font-mono text-[9px] font-bold px-2 py-1 rounded border shrink-0 ${severityColor(point.severity)}`}>
+                    {severityLabel(point.severity)}
+                  </span>
+                </div>
+              )) : (
+                <p className="font-mono text-[10px] text-muted-foreground py-4 text-center">KHÔNG CÓ DỮ LIỆU</p>
+              )}
+            </div>
+          </div>
+
+          <div ref={(el) => { sectionRefs.current[3] = el; }} className="glass-card p-0 overflow-hidden">
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-border/50">
+              <Zap className="h-4 w-4 text-[#00ff88]" />
+              <h2 className="font-mono text-sm font-bold text-[#00ff88] uppercase tracking-widest">THÔNG BÁO HỆ THỐNG</h2>
+            </div>
+            <div className="p-4 space-y-3">
+              <div className="rounded border border-[#00ff88]/20 bg-[#00ff88]/5 p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00ff88] animate-pulse" />
+                  <span className="font-mono text-[10px] text-[#00ff88] font-bold uppercase">ALL SYSTEMS NOMINAL</span>
+                </div>
+                <p className="font-mono text-[10px] text-muted-foreground">Không có cảnh báo nghiêm trọng. Hệ thống hoạt động bình thường.</p>
+              </div>
+              <div className="rounded border border-[#00d4ff]/20 bg-[#00d4ff]/5 p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <Activity className="h-3 w-3 text-[#00d4ff]" />
+                  <span className="font-mono text-[10px] text-[#00d4ff] font-bold uppercase">DATA SYNC ACTIVE</span>
+                </div>
+                <p className="font-mono text-[10px] text-muted-foreground">Dữ liệu đang được đồng bộ liên tục từ các nguồn báo cáo.</p>
+              </div>
+              <div className="mt-4 pt-4 border-t border-border/30">
+                <Link href="/map" className="flex items-center justify-between group rounded border border-[#ff3b3b]/30 bg-[#ff3b3b]/5 hover:bg-[#ff3b3b]/10 px-4 py-3 transition-colors">
+                  <span className="font-mono text-xs font-bold text-[#ff3b3b] uppercase">GỬI BÁO CÁO SỰ CỐ</span>
+                  <ChevronRight className="h-4 w-4 text-[#ff3b3b] group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }

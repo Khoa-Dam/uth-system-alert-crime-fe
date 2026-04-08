@@ -58,10 +58,17 @@ export const useMapCrimeMarkers = ({
                 ? `border: 3px solid #3b82f6; z-index: 1000; transform: scale(1.1); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5), ${color.shadow};` 
                 : `box-shadow:${color.shadow}, 0 2px 4px rgba(0,0,0,0.2);`;
 
+            const avatarUrl = report.reporterAvatar;
+            const innerContent = avatarUrl
+                ? `<img src="${avatarUrl}" alt="reporter" style="width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;" />`
+                : `<div class="${markerClass}" style="background-color:${color.hex} !important;width:100%;height:100%;${selectedStyle}"></div>`;
+
             const html = `
         <div style="position: relative; width: ${size}px; height: ${size}px;">
           ${isVerified || isSelected ? `<div class="pulse-ring" style="--color-rgb:${isSelected ? '59, 130, 246' : color.rgb}; width: ${size*2}px; height: ${size*2}px; top: -${size/2}px; left: -${size/2}px;"></div>` : ''}
-          <div class="${markerClass}" style="background-color:${color.hex} !important;width:100%;height:100%;${selectedStyle}"></div>
+          ${avatarUrl
+            ? `<div style="width:100%;height:100%;border-radius:50%;overflow:hidden;border:2px solid ${isSelected ? '#3b82f6' : color.hex};box-shadow:${isSelected ? `0 0 0 3px rgba(59,130,246,0.4),` : ''}${color.shadow},0 2px 4px rgba(0,0,0,0.2);">${innerContent}</div>`
+            : innerContent}
         </div>`;
 
             const marker = L.marker([report.lat, report.lng], {

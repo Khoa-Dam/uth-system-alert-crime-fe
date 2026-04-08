@@ -8,6 +8,8 @@ declare module "next-auth" {
             email?: string | null
             name?: string | null
             role?: string | null
+            avatar?: string | null
+            isGoogleUser?: boolean
         }
         accessToken?: string
         refreshToken?: string
@@ -18,6 +20,8 @@ declare module "next-auth" {
         email?: string | null
         name?: string | null
         role?: string | null
+        avatar?: string | null
+        isGoogleUser?: boolean
         accessToken?: string
         refreshToken?: string
         userId?: string
@@ -30,8 +34,11 @@ declare module "next-auth/jwt" {
         refreshToken?: string
         userId?: string
         role?: string | null
-        accessTokenExpires?: number  // Timestamp when access token expires
-        error?: string  // Error flag for failed refresh attempts
+        name?: string | null
+        avatar?: string | null
+        isGoogleUser?: boolean
+        accessTokenExpires?: number
+        error?: string
     }
 }
 

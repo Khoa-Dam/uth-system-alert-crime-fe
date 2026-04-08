@@ -30,6 +30,8 @@ export interface User {
     name: string;
     email: string;
     role: Role;
+    avatar?: string | null;
+    googleId?: string | null;
 }
 
 class UserService {
@@ -89,6 +91,36 @@ class UserService {
             await apiClient.delete(`${USER_BASE}/${id}`);
         } catch (error) {
             this.handleError(error, 'Không thể xóa người dùng');
+        }
+    }
+
+    /**
+     * Get own profile
+     */
+    async getMe(): Promise<User> {
+        try {
+            const response = await apiClient.get<User>(`${USER_BASE}/me`);
+            return response.data;
+        } catch (error) {
+            this.handleError(error, 'Không thể tải thông tin cá nhân');
+        }
+    }
+
+    /**
+     * Update own profile (name and/or avatar file)
+     */
+    async updateMe(payload: { name?: string; avatar?: File }): Promise<User> {
+        try {
+            const formData = new FormData();
+            if (payload.name !== undefined) formData.append('name', payload.name);
+            if (payload.avatar) formData.append('avatar', payload.avatar);
+
+            const response = await apiClient.put<User>(`${USER_BASE}/me`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data;
+        } catch (error) {
+            this.handleError(error, 'Cập nhật thông tin thất bại. Vui lòng thử lại.');
         }
     }
 
